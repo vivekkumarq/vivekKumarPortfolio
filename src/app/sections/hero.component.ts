@@ -47,7 +47,7 @@ import { RevealDirective } from '../shared/reveal.directive';
       <div class="u-shell relative grid min-h-[100svh] items-center gap-16 py-32 lg:grid-cols-[1.15fr_1fr]">
         <!-- Left column -->
         <div>
-          <div appReveal class="mb-7 inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/60 px-3.5 py-1.5">
+          <div appReveal class="mb-9 inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/60 px-3.5 py-1.5">
             <span class="relative flex h-2 w-2">
               <span class="u-pulse-ring absolute inline-flex h-full w-full rounded-full bg-accent"></span>
               <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
@@ -58,20 +58,20 @@ import { RevealDirective } from '../shared/reveal.directive';
             </span>
           </div>
 
-          <p appReveal [i]="1" class="u-eyebrow mb-4">{{ profile.role }}</p>
+          <p appReveal [i]="1" class="u-eyebrow mb-6">{{ profile.role }}</p>
 
           <h1 appReveal [i]="2" class="u-display text-[clamp(3rem,10vw,5.5rem)] text-ink">
             {{ profile.name }}
           </h1>
 
-          <div appReveal [i]="3" class="mt-5 flex items-center gap-4">
+          <div appReveal [i]="3" class="mt-7 flex items-center gap-4">
             <span class="h-px w-10 bg-accent"></span>
             <p class="font-mono text-sm tracking-[0.04em] text-ink-dim">
               {{ profile.subtitle }}
             </p>
           </div>
 
-          <p appReveal [i]="4" class="mt-8 max-w-xl text-[1.0625rem] leading-relaxed text-ink-dim">
+          <p appReveal [i]="4" class="mt-9 max-w-xl text-[1.0625rem] leading-relaxed text-ink-dim">
             I build backend microservices that hold up in production — Java and Spring Boot
             services, Kafka event pipelines, and GraphQL and REST APIs running on Kubernetes
             inside enterprise telecom platforms.

@@ -10,7 +10,7 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
 
   --color-ink: var(--c-ink);
   --color-ink-dim: var(--c-ink-dim);
@@ -39,6 +39,12 @@
   --c-gold: #d9a441;
   --dot: rgba(255, 255, 255, 0.055);
   --glow: rgba(94, 200, 173, 0.09);
+
+  /* Display face settings — see .u-display. Change these three together
+     when swapping the family, and update the font link in index.html. */
+  --display-weight: 500;
+  --display-track: -0.025em;
+
   color-scheme: dark;
 }
 
@@ -140,11 +146,14 @@ body {
   color: var(--c-accent);
 }
 
+/* Display face. Weight and tracking are tokens because different families
+   need different settings at hero size — a light serif and a 600-weight
+   grotesque cannot share one tracking value. */
 .u-display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.015em;
-  line-height: 1.05;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-track);
+  line-height: 1.08;
 }
 
 .u-card {
