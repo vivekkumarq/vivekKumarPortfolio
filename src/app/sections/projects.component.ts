@@ -124,7 +124,7 @@ import { IconComponent } from '../shared/icon.component';
           [href]="github"
           target="_blank"
           rel="noopener noreferrer"
-          class="u-link-underline inline-flex items-center gap-2 text-[0.9rem] text-ink transition-colors hover:text-accent"
+          class="u-link-underline -mx-2 inline-flex min-h-11 items-center gap-2 px-2 text-[0.9rem] text-ink transition-colors hover:text-accent"
         >
           All repositories on GitHub
           <app-icon name="arrow-up-right" cls="h-4 w-4" />

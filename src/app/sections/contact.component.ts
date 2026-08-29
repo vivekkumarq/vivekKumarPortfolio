@@ -50,7 +50,7 @@ type Channel = {
           <div class="mt-8 flex flex-wrap gap-3">
             <a
               [href]="'mailto:' + profile.email"
-              class="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-canvas transition-opacity hover:opacity-90"
+              class="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-canvas transition-opacity hover:opacity-90"
             >
               <app-icon name="mail" cls="h-4 w-4" />
               Send an email
@@ -58,7 +58,7 @@ type Channel = {
             <a
               [href]="profile.resumePath"
               download
-              class="inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm text-ink-dim transition-colors hover:border-accent hover:text-accent"
+              class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-5 text-sm text-ink-dim transition-colors hover:border-accent hover:text-accent"
             >
               <app-icon name="download" cls="h-4 w-4" />
               Download résumé
@@ -69,7 +69,7 @@ type Channel = {
         <!-- Channels -->
         <ul class="divide-y divide-line overflow-hidden rounded-xl border border-line">
           @for (channel of channels; track channel.label; let idx = $index) {
-            <li appReveal [i]="idx" class="group bg-surface">
+            <li appReveal [i]="idx" class="group relative bg-surface">
               <div class="flex items-center gap-4 px-5 py-4">
                 <span class="text-ink-faint transition-colors group-hover:text-accent">
                   <app-icon [name]="channel.icon" cls="h-4 w-4" />
@@ -83,7 +83,7 @@ type Channel = {
                     [href]="channel.href"
                     [attr.target]="channel.external ? '_blank' : null"
                     [attr.rel]="channel.external ? 'noopener noreferrer' : null"
-                    class="u-link-underline block truncate text-[0.9375rem] text-ink-dim transition-colors hover:text-accent"
+                    class="u-link-underline block truncate text-[0.9375rem] text-ink-dim transition-colors hover:text-accent after:absolute after:inset-0 after:content-['']"
                   >
                     {{ channel.value }}
                   </a>
@@ -93,7 +93,7 @@ type Channel = {
                   <button
                     type="button"
                     (click)="copyEmail()"
-                    class="shrink-0 rounded-md border border-line p-1.5 text-ink-faint transition-colors hover:border-accent hover:text-accent"
+                    class="relative z-10 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-line text-ink-faint transition-colors hover:border-accent hover:text-accent"
                     [attr.aria-label]="copied() ? 'Email address copied' : 'Copy email address'"
                   >
                     @if (copied()) {

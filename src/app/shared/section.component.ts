@@ -17,7 +17,7 @@ import { RevealDirective } from './reveal.directive';
   template: `
     <section
       [id]="sectionId()"
-      class="relative scroll-mt-24 border-t border-line-soft py-20 md:py-28"
+      class="relative scroll-mt-20 border-t border-line-soft py-16 sm:py-20 md:py-28"
     >
       <div class="u-shell">
         <div appReveal class="mb-3 flex items-center gap-3">
@@ -28,7 +28,7 @@ import { RevealDirective } from './reveal.directive';
           <span class="u-eyebrow">{{ eyebrow() }}</span>
         </div>
 
-        <h2 appReveal [i]="1" class="u-display text-4xl text-ink md:text-5xl">
+        <h2 appReveal [i]="1" class="u-display text-[2rem] text-ink sm:text-4xl md:text-5xl">
           {{ heading() }}
         </h2>
 
@@ -42,7 +42,7 @@ import { RevealDirective } from './reveal.directive';
           </p>
         }
 
-        <div class="mt-12">
+        <div class="mt-10 md:mt-12">
           <ng-content />
         </div>
       </div>

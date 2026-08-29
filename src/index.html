@@ -23,6 +23,20 @@
       rel="stylesheet"
     />
 
+    <!-- The scroll-reveal directive ships its class in the prerendered HTML,
+         which starts at opacity 0 and is only revealed by an
+         IntersectionObserver. Without this, a visitor with JavaScript
+         disabled — or a crawler that does not execute it — gets a blank
+         page even though all the content is right there in the markup. -->
+    <noscript>
+      <style>
+        .u-reveal {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
+
     <!-- Applied before first paint so the chosen theme never flashes. -->
     <script>
       (function () {

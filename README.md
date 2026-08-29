@@ -1,45 +1,91 @@
+<div align="center">
+
 # Vivek Kumar — Portfolio
 
-Personal portfolio site. Angular 22 (standalone, zoneless, signals) + Tailwind CSS v4,
-prerendered to static HTML and hosted on GitHub Pages.
+**Software Engineer · Java · Spring Boot · Microservices**
 
-**Live:** https://vivekkumarq.github.io
+My personal site. A single-page portfolio built with Angular 22 and Tailwind CSS v4,
+prerendered to static HTML and served from GitHub Pages.
+
+[**vivekkumarq.github.io**](https://vivekkumarq.github.io)
+
+[![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)](https://angular.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Deploy](https://github.com/vivekkumarq/vivekkumarq.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/vivekkumarq/vivekkumarq.github.io/actions/workflows/deploy.yml)
+
+</div>
 
 ---
 
-## Editing content
+## Why it's built this way
 
-**Everything on the site comes from one file: [`src/app/core/profile.ts`](src/app/core/profile.ts).**
-Change text there and it propagates — no component edits needed. That file drives the
-copy, the projects list, the skills, the nav, and the `<head>` tags (title, description,
-Open Graph, schema.org JSON-LD).
+I'm a backend engineer, so I approached the site the way I'd approach a service: keep the
+data separate from the delivery, make the output cacheable, and don't ship anything the
+runtime doesn't need.
 
-### The metric placeholders
+- **Content is data, not markup.** Everything the site says lives in one typed file,
+  `src/app/core/profile.ts`. Components read from it; none of them hold copy. Updating
+  the site is a data edit, not a template edit.
+- **Prerendered, not client-rendered.** The build runs Angular's static output mode, so
+  `dist/` is plain HTML with the content already in it. Crawlers, link unfurlers and
+  anyone on a slow connection get the full page without executing a line of JavaScript.
+- **One token set drives both themes.** Colours are CSS custom properties; components
+  only ever reference the semantic names (`text-ink`, `bg-surface`, `border-line`). No
+  component knows a hex value, so light and dark can't drift apart.
+- **~69 kB over the wire.** No UI framework, no icon package, no animation library. The
+  icons are inline SVG, the reveal animation is one directive over `IntersectionObserver`,
+  and the fonts are the only third-party request.
 
-The résumé these bullets came from has unfilled `[X]%` placeholders. Nothing on this site
-invents a number. Instead, each experience bullet carries a `metric` field:
+## Stack
 
-```ts
-{
-  text: 'Implemented **Kafka-based event-driven communication** …',
-  metric: null,                                  // nothing renders
-  // metric: { value: '2x', label: 'system throughput' },   // renders a stat chip
-}
+| Layer | Choice | Notes |
+| --- | --- | --- |
+| Framework | Angular 22 | Standalone components, zoneless, signals |
+| Language | TypeScript 6 | `strict`, `strictTemplates`, `noUnusedLocals` |
+| Styling | Tailwind CSS v4 | CSS-first config via `@theme` |
+| Rendering | Static prerender | `outputMode: "static"` — no Node server at runtime |
+| Type | Fraunces · Inter · JetBrains Mono | Display / body / mono |
+| Hosting | GitHub Pages | Deployed by GitHub Actions on push to `main` |
+
+## Features
+
+- Single-page layout with scroll-spy navigation and a mobile sheet
+- Light and dark themes, remembered in `localStorage`, applied before first paint so
+  there's no flash of the wrong theme
+- Scroll-triggered reveals that fully disable under `prefers-reduced-motion`
+- Résumé available as a direct PDF download
+- SEO handled at build time: title, description, Open Graph, Twitter card, canonical URL
+  and schema.org `Person` JSON-LD, all generated from the content file and baked into the
+  prerendered HTML
+- Accessibility: semantic heading order, a skip link, visible focus rings, `aria-expanded`
+  on disclosures, and 44 px minimum touch targets throughout
+- Responsive from 320 px up, with no horizontal scroll at any width
+
+## Project structure
+
+```
+src/
+├── index.html                  fonts, theme bootstrap, no-JS fallback
+├── styles.css                  design tokens (light + dark), shared utilities
+└── app/
+    ├── app.ts                  page composition
+    ├── core/
+    │   ├── profile.ts          ← all site content lives here
+    │   └── seo.service.ts      builds <head> from profile.ts
+    ├── shared/
+    │   ├── section.component.ts    section shell used by every section
+    │   ├── reveal.directive.ts     scroll reveal (IntersectionObserver)
+    │   ├── theme.service.ts        light/dark preference
+    │   ├── icon.component.ts       inline SVG icon set
+    │   └── rich-text.component.ts  renders **bold** without innerHTML
+    └── sections/
+        nav · hero · about · experience · projects · skills · education · contact · footer
 ```
 
-Fill in a figure you can defend in an interview and it renders automatically as a
-highlighted stat chip next to the bullet. Leave it `null` and the bullet reads cleanly
-with no gap. Recruiters respond to concrete numbers, so these are worth filling in — but
-only with real ones.
+## Running locally
 
-### Swapping the résumé PDF
-
-Replace `public/resume/Vivek_Kumar_Resume.pdf`. If you rename it, update
-`PROFILE.resumePath` in the content file to match.
-
----
-
-## Running it
+Requires Node 20.19+, 22.12+ or 24+.
 
 ```bash
 npm install
@@ -49,86 +95,67 @@ npm install
 npm start
 ```
 
-Dev server on http://localhost:4200 with hot reload.
+Dev server with hot reload on <http://localhost:4200>.
 
 ```bash
 npm run build
 ```
 
-Production build. Output lands in `dist/vivek-portfolio/browser/` as plain static files —
-the page is prerendered at build time, so crawlers and link unfurlers see the full content
-and metadata without running any JavaScript.
+Static output in `dist/vivek-portfolio/browser/` — deployable to any static host as-is.
 
----
+## Updating content
 
-## Deploying
+Everything is in `src/app/core/profile.ts`. Change it there and the whole site follows —
+including the page metadata.
 
-Pushing to `main` triggers [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
-which builds and publishes to GitHub Pages.
+Experience bullets support an optional metric that renders as a highlighted stat chip:
 
-**One-time setup:** in the repo, go to **Settings → Pages → Build and deployment** and set
-**Source** to **GitHub Actions**.
+```ts
+{
+  text: 'Implemented **Kafka-based event-driven communication** …',
+  metric: null,                                          // renders nothing
+  // metric: { value: '2x', label: 'system throughput' }, // renders a stat chip
+}
+```
 
-### Base href
+Leaving it `null` renders the bullet cleanly with no gap, so metrics can be added one at a
+time as they're confirmed.
 
-The build needs to know what path the site is served from. The workflow reads a repository
-variable `BASE_HREF` and falls back to `/`:
+To swap the résumé, replace `public/resume/Vivek_Kumar_Resume.pdf` and update
+`PROFILE.resumePath` if the filename changes.
 
-| Hosting | Repo name | `BASE_HREF` |
-| --- | --- | --- |
-| User site | `vivekkumarq.github.io` | `/` (default — nothing to do) |
-| Project site | anything else, e.g. `portfolio` | `/portfolio/` |
-| Custom domain | either | `/` |
+## Deployment
 
-Set it under **Settings → Secrets and variables → Actions → Variables** if you need
-something other than `/`.
+Every push to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
+which builds the site and publishes it to GitHub Pages.
 
-### Moving to a custom domain later
+Repository setup, once: **Settings → Pages → Build and deployment → Source: GitHub Actions.**
 
-1. Add a file `public/CNAME` containing just the domain, e.g. `vivekkumar.dev`.
-   It gets copied into the build output automatically.
-2. Point the domain's DNS at GitHub Pages (`A` records to GitHub's four Pages IPs, or a
-   `CNAME` record to `vivekkumarq.github.io`).
-3. Set the domain under **Settings → Pages → Custom domain** and enable **Enforce HTTPS**.
+The workflow reads an optional `BASE_HREF` repository variable, defaulting to `/`:
+
+| Hosting | `BASE_HREF` |
+| --- | --- |
+| User site (`vivekkumarq.github.io`) | `/` — the default |
+| Project site (e.g. `/portfolio`) | `/portfolio/` |
+| Custom domain | `/` |
+
+### Custom domain
+
+1. Add `public/CNAME` containing only the domain — it's copied into the build output.
+2. Point DNS at GitHub Pages (`A` records to GitHub's Pages IPs, or a `CNAME` to
+   `vivekkumarq.github.io`).
+3. Set the domain under **Settings → Pages**, then enable **Enforce HTTPS**.
 4. Update `PROFILE.siteUrl` in `src/app/core/profile.ts` so the canonical URL, Open Graph
-   tags and JSON-LD point at the new domain. Ship it — otherwise search engines keep
-   crediting the old address.
+   tags and JSON-LD point at the new address.
+
+## Contact
+
+- **Email** — [vkumar.vivek222@gmail.com](mailto:vkumar.vivek222@gmail.com)
+- **LinkedIn** — [vivek-k-87036b104](https://www.linkedin.com/in/vivek-k-87036b104/)
+- **GitHub** — [@vivekkumarq](https://github.com/vivekkumarq)
 
 ---
 
-## Structure
-
-```
-src/
-  index.html                    fonts, no-flash theme bootstrap
-  styles.css                    design tokens (light + dark), shared utilities
-  app/
-    app.ts                      page composition
-    core/
-      profile.ts                ← all content lives here
-      seo.service.ts            drives <head> from profile.ts
-    shared/
-      section.component.ts      the section shell every section uses
-      reveal.directive.ts       scroll-triggered fade-in (IntersectionObserver)
-      theme.service.ts          light/dark preference
-      icon.component.ts         inline SVG icon set
-      rich-text.component.ts    renders **bold** in content strings
-    sections/
-      nav / hero / about / experience / projects / skills / education / contact / footer
-```
-
-### Theming
-
-Colours are CSS custom properties on `:root`, overridden under `[data-theme="light"]`, and
-exposed to Tailwind through `@theme` in `styles.css`. Components only ever use the token
-utilities (`text-ink`, `bg-surface`, `border-line`, `text-accent`, …), never raw hex — so
-changing the palette is a one-file edit and both themes stay in sync.
-
-The initial theme is applied by a small inline script in `index.html` before first paint,
-so there is no flash of the wrong theme on load.
-
-### Accessibility & motion
-
-Semantic headings, a skip link, visible focus rings, `aria-expanded` on the disclosure
-controls, and `aria-hidden` on decorative icons. Every animation is disabled under
-`prefers-reduced-motion: reduce`.
+<div align="center">
+<sub>© 2026 Vivek Kumar</sub>
+</div>

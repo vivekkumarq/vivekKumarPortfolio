@@ -23,7 +23,7 @@ import { IconComponent } from '../shared/icon.component';
             [href]="profile.github"
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-full border border-line p-2.5 text-ink-faint transition-colors hover:border-accent hover:text-accent"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-faint transition-colors hover:border-accent hover:text-accent"
             aria-label="GitHub profile"
           >
             <app-icon name="github" cls="h-4 w-4" />
@@ -32,21 +32,21 @@ import { IconComponent } from '../shared/icon.component';
             [href]="profile.linkedin"
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-full border border-line p-2.5 text-ink-faint transition-colors hover:border-accent hover:text-accent"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-faint transition-colors hover:border-accent hover:text-accent"
             aria-label="LinkedIn profile"
           >
             <app-icon name="linkedin" cls="h-4 w-4" />
           </a>
           <a
             [href]="'mailto:' + profile.email"
-            class="rounded-full border border-line p-2.5 text-ink-faint transition-colors hover:border-accent hover:text-accent"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-faint transition-colors hover:border-accent hover:text-accent"
             aria-label="Send an email"
           >
             <app-icon name="mail" cls="h-4 w-4" />
           </a>
           <a
             href="#top"
-            class="ml-2 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-faint uppercase transition-colors hover:text-accent"
+            class="ml-2 inline-flex min-h-11 items-center font-mono text-[0.6875rem] tracking-[0.12em] text-ink-faint uppercase transition-colors hover:text-accent"
           >
             Back to top
           </a>

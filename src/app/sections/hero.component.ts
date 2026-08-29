@@ -44,7 +44,9 @@ import { RevealDirective } from '../shared/reveal.directive';
         <path d="M50 30 68 40v20L50 70 32 60V40Z" />
       </svg>
 
-      <div class="u-shell relative grid min-h-[100svh] items-center gap-16 py-32 lg:grid-cols-[1.15fr_1fr]">
+      <div
+        class="u-shell relative grid items-center gap-12 py-24 sm:py-28 lg:min-h-[100svh] lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:py-32"
+      >
         <!-- Left column -->
         <div>
           <div appReveal class="mb-9 inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/60 px-3.5 py-1.5">
@@ -52,8 +54,16 @@ import { RevealDirective } from '../shared/reveal.directive';
               <span class="u-pulse-ring absolute inline-flex h-full w-full rounded-full bg-accent"></span>
               <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
             </span>
-            <span class="font-mono text-[0.6875rem] tracking-[0.1em] text-ink-dim">
-              Currently building at
+            <!-- The full label wraps to a second line under ~400px, so the
+                 lead-in shortens and the tracking relaxes on narrow screens.
+                 The &nbsp; are load-bearing: Angular strips whitespace-only
+                 text nodes between elements, which would glue the words to
+                 the company name. -->
+            <span
+              class="font-mono text-[0.6875rem] tracking-[0.02em] whitespace-nowrap text-ink-dim sm:tracking-[0.1em]"
+            >
+              <span class="sm:hidden">Building&nbsp;at&nbsp;</span>
+              <span class="hidden sm:inline">Currently&nbsp;building&nbsp;at&nbsp;</span>
               <span class="text-ink">{{ profile.company }}</span>
             </span>
           </div>
@@ -64,9 +74,11 @@ import { RevealDirective } from '../shared/reveal.directive';
             {{ profile.name }}
           </h1>
 
-          <div appReveal [i]="3" class="mt-7 flex items-center gap-4">
-            <span class="h-px w-10 bg-accent"></span>
-            <p class="font-mono text-sm tracking-[0.04em] text-ink-dim">
+          <div appReveal [i]="3" class="mt-7 flex items-center gap-3 sm:gap-4">
+            <span class="h-px w-8 shrink-0 bg-accent sm:w-10"></span>
+            <!-- text-xs keeps the stack on one line at 375px; wrapping left
+                 the rule stranded beside a two-line paragraph. -->
+            <p class="font-mono text-xs tracking-[0.04em] text-ink-dim sm:text-sm">
               {{ profile.subtitle }}
             </p>
           </div>
@@ -81,7 +93,7 @@ import { RevealDirective } from '../shared/reveal.directive';
           <div appReveal [i]="5" class="mt-10 flex flex-wrap items-center gap-3">
             <a
               [href]="'mailto:' + profile.email"
-              class="group inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-canvas transition-opacity hover:opacity-90"
+              class="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-canvas transition-opacity hover:opacity-90"
             >
               <app-icon name="mail" cls="h-4 w-4" />
               Get in touch
@@ -90,7 +102,7 @@ import { RevealDirective } from '../shared/reveal.directive';
             <a
               [href]="profile.resumePath"
               download
-              class="inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm text-ink-dim transition-colors hover:border-accent hover:text-accent"
+              class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-5 text-sm text-ink-dim transition-colors hover:border-accent hover:text-accent"
             >
               <app-icon name="download" cls="h-4 w-4" />
               Résumé
@@ -100,7 +112,7 @@ import { RevealDirective } from '../shared/reveal.directive';
               [href]="profile.github"
               target="_blank"
               rel="noopener noreferrer"
-              class="rounded-full border border-line p-2.5 text-ink-dim transition-colors hover:border-accent hover:text-accent"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-dim transition-colors hover:border-accent hover:text-accent"
               aria-label="GitHub profile"
             >
               <app-icon name="github" cls="h-4 w-4" />
@@ -110,7 +122,7 @@ import { RevealDirective } from '../shared/reveal.directive';
               [href]="profile.linkedin"
               target="_blank"
               rel="noopener noreferrer"
-              class="rounded-full border border-line p-2.5 text-ink-dim transition-colors hover:border-accent hover:text-accent"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-dim transition-colors hover:border-accent hover:text-accent"
               aria-label="LinkedIn profile"
             >
               <app-icon name="linkedin" cls="h-4 w-4" />
@@ -123,8 +135,9 @@ import { RevealDirective } from '../shared/reveal.directive';
           </p>
         </div>
 
-        <!-- Right column: service manifest -->
-        <div appReveal [i]="4" class="hidden lg:block">
+        <!-- Right column on desktop; stacks under the intro on phones, where
+             it is the most distinctive thing on the screen and worth keeping. -->
+        <div appReveal [i]="4">
           <div class="u-card overflow-hidden">
             <div class="flex items-center gap-2 border-b border-line px-4 py-3">
               <span class="h-2.5 w-2.5 rounded-full border border-line"></span>
@@ -135,7 +148,7 @@ import { RevealDirective } from '../shared/reveal.directive';
               </span>
             </div>
 
-            <dl class="space-y-0 p-5 font-mono text-[0.78rem] leading-7">
+            <dl class="space-y-0 p-4 font-mono text-[0.7rem] leading-7 sm:p-5 sm:text-[0.78rem]">
               @for (row of manifest; track row.key) {
                 <div class="flex gap-3">
                   <dt class="shrink-0 text-ink-faint">{{ row.key }}:</dt>

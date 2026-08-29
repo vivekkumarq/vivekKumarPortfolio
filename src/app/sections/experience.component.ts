@@ -115,7 +115,7 @@ import { SectionComponent } from '../shared/section.component';
           type="button"
           (click)="toggle()"
           [attr.aria-expanded]="expanded()"
-          class="mt-5 inline-flex items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-accent"
+          class="mt-3 -mx-2 inline-flex min-h-11 items-center gap-2 px-2 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-accent"
         >
           @if (expanded()) {
             Show less

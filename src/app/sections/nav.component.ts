@@ -31,9 +31,11 @@ import { IconComponent } from '../shared/icon.component';
     >
       <nav class="u-shell flex h-16 items-center justify-between gap-4" aria-label="Primary">
         <!-- Monogram -->
+        <!-- Negative margin keeps the visual position while the padding
+             gives the link a full-size tap target. -->
         <a
           href="#top"
-          class="u-display text-xl tracking-tight text-ink transition-colors hover:text-accent"
+          class="-m-2 inline-flex min-h-11 items-center p-2 u-display text-xl tracking-tight text-ink transition-colors hover:text-accent"
           aria-label="Back to top"
         >
           {{ initials }}<span class="text-accent">.</span>
@@ -61,7 +63,7 @@ import { IconComponent } from '../shared/icon.component';
           <a
             [href]="resumePath"
             download
-            class="hidden items-center gap-2 rounded-full border border-line px-3.5 py-1.5 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-dim uppercase transition-colors hover:border-accent hover:text-accent sm:flex"
+            class="hidden min-h-11 items-center gap-2 rounded-full border border-line px-4 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-dim uppercase transition-colors hover:border-accent hover:text-accent sm:inline-flex md:min-h-9"
           >
             <app-icon name="download" cls="h-3.5 w-3.5" />
             Résumé
@@ -70,7 +72,7 @@ import { IconComponent } from '../shared/icon.component';
           <button
             type="button"
             (click)="theme.toggle()"
-            class="rounded-full border border-line p-2 text-ink-dim transition-colors hover:border-accent hover:text-accent"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-dim transition-colors hover:border-accent hover:text-accent md:h-9 md:w-9"
             [attr.aria-label]="
               theme.theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
             "
@@ -85,7 +87,7 @@ import { IconComponent } from '../shared/icon.component';
           <button
             type="button"
             (click)="menuOpen.set(!menuOpen())"
-            class="rounded-full border border-line p-2 text-ink-dim transition-colors hover:border-accent hover:text-accent md:hidden"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-dim transition-colors hover:border-accent hover:text-accent md:hidden"
             [attr.aria-expanded]="menuOpen()"
             aria-controls="mobile-menu"
             [attr.aria-label]="menuOpen() ? 'Close menu' : 'Open menu'"
