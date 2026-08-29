@@ -24,9 +24,19 @@ export const PROFILE = {
   github: "https://github.com/vivekkumarq",
   githubHandle: "vivekkumarq",
   linkedin: "https://www.linkedin.com/in/vivek-k-87036b104/",
-  resumePath: "/resume/Vivek_Kumar_Resume.pdf",
-  /** Update when you deploy to a custom domain. */
-  siteUrl: "https://vivekkumarq.github.io",
+  /**
+   * Relative on purpose — no leading slash. The site is served from a
+   * subpath (/vivekKumarPortfolio/), so a root-absolute path would
+   * resolve against the domain root and 404. This resolves against the
+   * <base href> the build injects.
+   */
+  resumePath: "resume/Vivek_Kumar_Resume.pdf",
+  /**
+   * Canonical URL, used for <link rel="canonical">, Open Graph and
+   * JSON-LD. No trailing slash. Update this when moving to a custom
+   * domain, or search engines keep crediting the old address.
+   */
+  siteUrl: "https://vivekkumarq.github.io/vivekKumarPortfolio",
   availability: "Open to backend & platform engineering roles",
 } as const;
 

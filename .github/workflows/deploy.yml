@@ -31,10 +31,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # BASE_HREF must match how the site is served:
-      #   user site  (repo named vivekkumarq.github.io)  ->  /
-      #   project site (repo named e.g. portfolio)       ->  /portfolio/
-      #   custom domain (CNAME present)                  ->  /
+      # BASE_HREF must match the path the site is served from, or every
+      # asset 404s. Set as a repository variable under
+      # Settings -> Secrets and variables -> Actions -> Variables.
+      #   project site (current)  ->  /vivekKumarPortfolio/
+      #   user site               ->  /
+      #   custom domain (CNAME)   ->  /
       - name: Build
         run: npm run build -- --base-href "${{ vars.BASE_HREF || '/' }}"
 
