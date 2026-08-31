@@ -30,7 +30,7 @@ type Channel = {
   template: `
     <app-section
       sectionId="contact"
-      index="06"
+      index="07"
       eyebrow="Get in touch"
       heading="Contact"
       [lead]="lead"

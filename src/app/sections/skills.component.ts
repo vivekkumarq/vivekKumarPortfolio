@@ -21,7 +21,7 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
   template: `
     <app-section
       sectionId="skills"
-      index="04"
+      index="05"
       eyebrow="Toolkit"
       heading="Skills &amp; Competencies"
       [lead]="lead"

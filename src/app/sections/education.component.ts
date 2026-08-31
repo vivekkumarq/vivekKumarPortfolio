@@ -17,7 +17,7 @@ import { EDUCATION, AWARDS } from '../core/profile';
   template: `
     <app-section
       sectionId="education"
-      index="05"
+      index="06"
       eyebrow="Background"
       heading="Education &amp; Recognition"
       [lead]="lead"
