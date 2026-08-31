@@ -241,6 +241,69 @@ export const PROJECTS: Project[] = [
   },
 ];
 
+/* ──────────────── OPEN SOURCE ──────────────── */
+
+/**
+ * Upstream contributions. Keep this honest: `status` is the real state of
+ * the pull request, not an aspiration. "approved" means reviewed and
+ * accepted but NOT yet merged — say so rather than rounding up to merged,
+ * and move it to "merged" only once it actually lands.
+ *
+ * `stars` is a rounded snapshot, not a live figure. Refresh it when you
+ * touch this file; nothing here fetches from GitHub at runtime.
+ */
+export type ContributionStatus = "merged" | "approved" | "resolved";
+
+export type Contribution = {
+  kind: "pr" | "issue";
+  number: number;
+  title: string;
+  url: string;
+  status: ContributionStatus;
+  /** What was wrong and what changed. Two sentences at most. */
+  detail: string;
+  /** Diff size, e.g. "+181 across 6 files". `null` renders nothing. */
+  diff: string | null;
+  /** Anything citable: milestone, linked issue, reviewer. `null` = omit. */
+  meta: string | null;
+};
+
+export type OpenSourceProject = {
+  project: string;
+  owner: string;
+  description: string;
+  repoUrl: string;
+  /** Rounded star count at the time of writing, e.g. "26.7k". */
+  stars: string;
+  tags: string[];
+  contributions: Contribution[];
+};
+
+export const OPEN_SOURCE: OpenSourceProject[] = [
+  {
+    project: "openapi-generator",
+    owner: "OpenAPITools",
+    description:
+      "Generates API clients, server stubs and documentation from an OpenAPI specification.",
+    repoUrl: "https://github.com/OpenAPITools/openapi-generator",
+    stars: "26.7k",
+    tags: ["Kotlin", "Mustache", "Code Generation"],
+    contributions: [
+      {
+        kind: "pr",
+        number: 24810,
+        title: "Emit KDoc for operation summary and description in jaxrs-spec interfaces",
+        url: "https://github.com/OpenAPITools/openapi-generator/pull/24810",
+        status: "merged",
+        detail:
+          "The Kotlin jaxrs-spec generator emitted API interfaces carrying only JAX-RS annotations, so operations documented in the spec arrived undocumented in the generated code — while the equivalent Java generator had always produced Javadoc. The template now builds a KDoc block from the operation summary and notes, with @param for documented parameters and @return for the responses.",
+        diff: "+181 across 6 files",
+        meta: "Closes #24794 · ships in 7.26.0",
+      },
+    ],
+  },
+];
+
 /* ──────────────── SKILLS ──────────────── */
 
 export type SkillGroup = { group: string; items: string[] };
@@ -360,6 +423,7 @@ export const AWARDS = [
 export const NAV_LINKS = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
+  { href: "#open-source", label: "Open Source" },
   { href: "#projects", label: "Projects" },
   { href: "#skills", label: "Skills" },
   { href: "#education", label: "Education" },
