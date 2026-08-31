@@ -5,6 +5,7 @@ import { NavComponent } from './sections/nav.component';
 import { HeroComponent } from './sections/hero.component';
 import { AboutComponent } from './sections/about.component';
 import { ExperienceComponent } from './sections/experience.component';
+import { OpenSourceComponent } from './sections/open-source.component';
 import { ProjectsComponent } from './sections/projects.component';
 import { SkillsComponent } from './sections/skills.component';
 import { EducationComponent } from './sections/education.component';
@@ -19,6 +20,7 @@ import { FooterComponent } from './sections/footer.component';
     HeroComponent,
     AboutComponent,
     ExperienceComponent,
+    OpenSourceComponent,
     ProjectsComponent,
     SkillsComponent,
     EducationComponent,
@@ -39,6 +41,7 @@ import { FooterComponent } from './sections/footer.component';
       <app-hero />
       <app-about />
       <app-experience />
+      <app-open-source />
       <app-projects />
       <app-skills />
       <app-education />

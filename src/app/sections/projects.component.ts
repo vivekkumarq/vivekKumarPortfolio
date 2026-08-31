@@ -18,7 +18,7 @@ import { IconComponent } from '../shared/icon.component';
   template: `
     <app-section
       sectionId="projects"
-      index="03"
+      index="04"
       eyebrow="Things I've built"
       heading="Projects"
       [lead]="lead"
