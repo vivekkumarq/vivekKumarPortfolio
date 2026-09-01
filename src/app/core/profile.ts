@@ -10,6 +10,8 @@
    without it. See `EXPERIENCE` below.
    ──────────────────────────────────────────────────────────────── */
 
+import type { IconName } from "../shared/icon.component";
+
 /* ──────────────── EXPERIENCE CLOCK ──────────────── */
 
 /** First day of the first full-time role. Everything below derives from it. */
@@ -86,7 +88,7 @@ export const PROFILE = {
 
 export const SEO = {
   title: "Vivek Kumar — Software Engineer | Java, Spring Boot, Microservices",
-  description: `Software Engineer with ${experienceLabel()} years building scalable backend microservices in Java, Spring Boot, Quarkus and Kubernetes. Enterprise telecom systems, event-driven architecture with Kafka, GraphQL and REST API design.`,
+  description: `Software Engineer with ${experienceLabel()} years building scalable backend microservices in Java, Spring Boot, Quarkus and Kubernetes. Enterprise telecom systems, event-driven architecture with Kafka, GraphQL and REST API design. Open-source contributor to OpenAPI Generator.`,
   keywords: [
     "Vivek Kumar",
     "Java Backend Developer",
@@ -107,7 +109,7 @@ export const ABOUT = {
   paragraphs: [
     "I'm a backend engineer who likes the unglamorous half of software — the part where a service has to stay up, stay fast, and stay understandable a year after it shipped.",
     `For the past ${experienceYearsWord()} years at **Netcracker Technology** I've built microservices that run inside enterprise telecom platforms: GraphQL and REST APIs, Kafka-driven event pipelines, and Spring Boot services deployed on Kubernetes. Most of that work sits behind dashboards used by business teams at carriers like **Etisalat**, where a slow query or a dropped event is somebody's workday.`,
-    "I care about clean architecture, low-level design, and code that a reviewer can follow without a meeting. Outside of work I build small backend systems end-to-end — order platforms, billing engines, API tooling — mostly to keep pushing on system design.",
+    "I care about clean architecture, low-level design, and code that a reviewer can follow without a meeting. Outside of work I ship products end to end — most recently **MathStrokes**, a live online examination platform for JEE students, alongside the order, billing and API platforms below — mostly to keep pushing on system design.",
   ],
   /** Small stat chips. Keep to 3–4; every number here must be defensible. */
   stats: [
@@ -234,62 +236,67 @@ export type Project = {
   detail: string;
   tags: string[];
   repo: string;
+  /** Deployed URL, for projects that are live. */
+  live?: string;
   featured: boolean;
 };
 
+/** Mirrors the Projects section of the September 2026 resume. */
 export const PROJECTS: Project[] = [
   {
-    name: "Event-Driven Order Platform",
-    blurb: "Kafka-backed order processing across loosely coupled services.",
+    name: "MathStrokes",
+    blurb: "A live online mathematics examination platform for JEE.",
     detail:
-      "Microservices order-processing platform built on asynchronous Kafka messaging and Spring Boot REST APIs. Producer–consumer topic architecture handles the full order lifecycle with fault tolerance and horizontal scalability.",
-    tags: ["Java", "Spring Boot", "Kafka", "Microservices"],
+      "Full-stack timed-examination platform (Java 21, Spring Boot 3.5, Angular 22) where teachers author LaTeX questions and students sit 25-question, 60-minute papers with a server-authoritative clock, resumable attempts, and rank and percentile analytics. Immutable attempt snapshots, server-side-only evaluation with JEE partial marking, rotating refresh tokens, and 63 unit tests plus 105 end-to-end assertions.",
+    tags: ["Java", "Spring Boot", "Angular", "PostgreSQL", "Spring Security"],
+    repo: "https://github.com/vivekkumarq/MathStrokes",
+    live: "https://iota-jee.netlify.app",
+    featured: true,
+  },
+  {
+    name: "CatalystRead",
+    blurb: "Markdown-driven technical publishing, fully static.",
+    detail:
+      "Static publishing platform serving 220+ technical articles across 30+ topics: a build-time Markdown pipeline with syntax highlighting and related-article scoring, 500+ prerendered routes at ~120 kB initial transfer, instant search, dark mode, and RSS and sitemap auto-generated through GitHub Actions.",
+    tags: ["Angular", "TypeScript", "Tailwind CSS", "GitHub Actions"],
+    repo: "https://github.com/vivekkumarq/CatalystRead",
+    live: "https://vivekkumarq.github.io/CatalystRead",
+    featured: true,
+  },
+  {
+    name: "Event-Driven Order Platform",
+    blurb: "A choreographed saga across microservices, over Kafka only.",
+    detail:
+      "Independent order and inventory microservices communicating exclusively through Kafka: a transactional outbox preventing dual-write failures, idempotent consumers with eventId deduplication, optimistic locking for concurrent stock updates, dead-letter topics with bounded retry, compensating cancellation events, and Prometheus/Micrometer business metrics.",
+    tags: ["Java", "Spring Boot", "Kafka", "PostgreSQL", "Microservices"],
     repo: "https://github.com/vivekkumarq/event-driven-order-platform",
     featured: true,
   },
   {
-    name: "Subscription Billing Platform",
-    blurb: "Plans, proration and recurring invoicing, modelled properly.",
+    name: "Subscription & Billing Platform",
+    blurb: "Multi-tenant SaaS billing with day-based proration.",
     detail:
-      "Subscription management and billing system covering plans, invoicing and recurring billing logic on Java, Spring Boot and PostgreSQL. REST endpoints handle plan upgrades, proration and automated invoice generation.",
-    tags: ["Java", "Spring Boot", "PostgreSQL", "REST"],
+      "Multi-tenant billing backend with Keycloak JWT tenant isolation, mid-cycle plan changes with day-based proration, asynchronous usage metering through a partitioned Kafka pipeline with inbox-pattern idempotency and dead-lettering, immutable BigDecimal invoices with line-item breakdowns, quota threshold alerts, and custom revenue metrics exposed to Prometheus.",
+    tags: ["Java", "Spring Boot", "Kafka", "Keycloak", "PostgreSQL"],
     repo: "https://github.com/vivekkumarq/subscription-billing-platform",
     featured: true,
   },
   {
     name: "API Orchestrator Platform",
-    blurb: "A lightweight Postman, built from the backend outward.",
+    blurb: "A self-hosted, Postman-style API execution platform.",
     detail:
-      "Postman-style API client platform with a Spring Boot backend, centralising complex service communication. Supports request chaining, environment variables and response validation for repeatable API testing workflows.",
-    tags: ["Spring Boot", "REST", "Orchestration"],
+      "Collections and environments with variable substitution, request chaining via JSONPath extraction, seven assertion types, automatic retries with exponential backoff, an SSRF-safe outbound policy, execution history with replay, and Postman v2.1 import/export — Spring WebClient backend, React 19 front end.",
+    tags: ["Java", "Spring Boot", "React", "PostgreSQL", "REST"],
     repo: "https://github.com/vivekkumarq/api-orchestrator-platform",
-    featured: true,
+    featured: false,
   },
   {
     name: "Parking Lot Management System",
-    blurb: "A clean-room LLD exercise in SOLID and design patterns.",
+    blurb: "Concurrency-safe bay allocation for multi-block car parks.",
     detail:
-      "Parking-lot system in Java built around object-oriented design and SOLID principles — vehicle entry, dynamic slot allocation, ticketing and pricing. Strategy and Factory patterns keep vehicle types and pricing rules extensible.",
-    tags: ["Java", "OOP", "LLD", "Design Patterns"],
+      "Five-module REST backend: compare-and-set bay allocation preventing double-booking without table locks, BigDecimal pricing with grace periods and daily caps, reservations with background expiry sweeps, RSQL-filtered listings, revenue, occupancy and peak-hour reporting, and 241 tests including 23 dedicated concurrency tests.",
+    tags: ["Java", "Spring Boot", "jOOQ", "Flyway", "PostgreSQL"],
     repo: "https://github.com/vivekkumarq/ParkingLotManagement",
-    featured: false,
-  },
-  {
-    name: "Document Organizer",
-    blurb: "Metadata-driven document storage with tag-based search.",
-    detail:
-      "Spring Boot and PostgreSQL backend that organises documents with structured metadata and storage logic, exposing REST APIs for upload, retrieval, categorisation and tag-based search.",
-    tags: ["Java", "Spring Boot", "PostgreSQL", "REST"],
-    repo: "https://github.com/vivekkumarq/document-organizer",
-    featured: false,
-  },
-  {
-    name: "Movie House",
-    blurb: "Spring Boot microservices with service discovery.",
-    detail:
-      "A microservices-based movie catalogue built with Spring Boot, exploring service decomposition, inter-service communication and a registry-driven discovery setup.",
-    tags: ["Java", "Spring Boot", "Microservices"],
-    repo: "https://github.com/vivekkumarq/movie-house",
     featured: false,
   },
 ];
@@ -392,45 +399,87 @@ export const OPEN_SOURCE: OpenSourceProject[] = [
 
 /* ──────────────── SKILLS ──────────────── */
 
-export type SkillGroup = { group: string; items: string[] };
+export type SkillGroup = { group: string; icon: IconName; items: string[] };
 
+/** Mirrors the Technical Skills section of the September 2026 resume. */
 export const SKILLS: SkillGroup[] = [
-  { group: "Languages", items: ["Java", "SQL", "Groovy"] },
   {
-    group: "Frameworks",
-    items: ["Spring", "Spring Boot", "Quarkus", "Hibernate", "JPA", "jOOQ"],
+    group: "Languages",
+    icon: "code",
+    items: ["Java", "SQL", "Groovy", "TypeScript"],
+  },
+  {
+    group: "Backend Frameworks",
+    icon: "layers",
+    items: [
+      "Spring Boot",
+      "Spring Framework",
+      "Spring Security",
+      "Spring Data JPA",
+      "Quarkus",
+      "Hibernate",
+      "jOOQ",
+    ],
   },
   {
     group: "APIs & Messaging",
-    items: ["GraphQL", "REST APIs", "Kafka", "Reactive Architecture", "DSL"],
+    icon: "zap",
+    items: [
+      "REST APIs",
+      "GraphQL",
+      "Apache Kafka",
+      "Event-Driven Architecture",
+      "Swagger/OpenAPI",
+    ],
+  },
+  {
+    group: "Frontend",
+    icon: "monitor",
+    items: ["Angular", "React", "Tailwind CSS", "HTML/CSS"],
   },
   {
     group: "DevOps & Cloud",
+    icon: "server",
     items: [
       "Docker",
       "Kubernetes",
       "OpenLens",
       "GitLab CI/CD",
       "Jenkins",
-      "FlywayDB",
+      "GitHub Actions",
+      "Flyway",
       "Keycloak",
     ],
   },
-  { group: "Databases", items: ["PostgreSQL", "SQL"] },
+  { group: "Databases", icon: "database", items: ["PostgreSQL", "H2"] },
   {
-    group: "Tools & Testing",
-    items: ["GitHub", "Postman", "JUnit", "Mockito", "Swagger / OpenAPI"],
+    group: "Testing & Tools",
+    icon: "terminal",
+    items: [
+      "JUnit 5",
+      "Mockito",
+      "AssertJ",
+      "Git",
+      "GitHub",
+      "Maven",
+      "Postman",
+      "Prometheus",
+      "Micrometer",
+    ],
   },
   {
     group: "Concepts",
+    icon: "grid",
     items: [
       "Microservices",
       "Distributed Systems",
-      "System Design",
-      "LLD",
+      "Transactional Outbox",
+      "Idempotency",
+      "Optimistic Locking",
       "Design Patterns",
       "Clean Architecture",
       "DSA",
+      "LLD & System Design",
     ],
   },
 ];
@@ -446,15 +495,20 @@ export const SKILL_TICKER: string[] = [
   "PostgreSQL",
   "Kubernetes",
   "Docker",
+  "Angular",
+  "React",
+  "TypeScript",
+  "Tailwind CSS",
   "Hibernate",
   "jOOQ",
   "Keycloak",
   "Jenkins",
   "GitLab CI/CD",
+  "GitHub Actions",
+  "Flyway",
   "JUnit",
   "Mockito",
-  "Swagger",
-  "FlywayDB",
+  "Prometheus",
   "Microservices",
   "System Design",
 ];
@@ -466,8 +520,10 @@ export const COMPETENCIES: string[] = [
   "Microservices Architecture",
   "API Design (REST & GraphQL)",
   "Event-Driven Architecture",
-  "System Design",
+  "System Design & LLD",
   "Database Design",
+  "Multi-Tenant SaaS",
+  "Authentication & RBAC",
   "CI/CD Automation",
   "Containerization",
   "Cloud-Native Development",

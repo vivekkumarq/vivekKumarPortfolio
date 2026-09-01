@@ -7,6 +7,7 @@ import { PROJECTS } from '../core/profile';
  */
 const ALIASES: Record<string, string> = {
   'rest apis': 'rest',
+  'apache kafka': 'kafka',
 };
 
 const normalize = (skill: string): string => {

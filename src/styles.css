@@ -72,6 +72,13 @@
    loads, so switching costs no extra download.
    ───────────────────────────────────────────────────────────── */
 
+[data-font="grotesk"] {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --display-weight: 600;
+  --display-track: -0.03em;
+}
+
 [data-font="mono"] {
   --font-sans: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-display: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -81,6 +88,13 @@
 
 [data-font="serif"] {
   --font-sans: "Fraunces", Georgia, "Times New Roman", serif;
+}
+
+[data-font="rounded"] {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --display-weight: 700;
+  --display-track: -0.02em;
 }
 
 *,

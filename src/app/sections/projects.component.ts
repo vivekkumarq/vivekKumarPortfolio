@@ -8,6 +8,7 @@ import { PROFILE, PROJECTS, type Project } from '../core/profile';
 import { SectionComponent } from '../shared/section.component';
 import { RevealDirective } from '../shared/reveal.directive';
 import { IconComponent } from '../shared/icon.component';
+import { TechIconComponent } from '../shared/tech-icon.component';
 import { SkillFilterService } from '../shared/skill-filter.service';
 
 /**
@@ -19,13 +20,14 @@ import { SkillFilterService } from '../shared/skill-filter.service';
  * names the filter with a reset control. Cards re-enter through the same
  * staggered reveal used on scroll, which doubles as the filter transition.
  *
- * Each card is a single <a> wrapping its content, so nothing inside may be
- * another anchor: the "View source" affordance is a <span>.
+ * Featured cards are <div>s with a stretched source link (after:inset-0)
+ * so the whole card stays clickable while a project's live-demo link sits
+ * above it at z-10 — anchors cannot nest, and live projects need both.
  */
 @Component({
   selector: 'app-projects',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SectionComponent, RevealDirective, IconComponent],
+  imports: [SectionComponent, RevealDirective, IconComponent, TechIconComponent],
   template: `
     <app-section
       sectionId="projects"
@@ -40,6 +42,7 @@ import { SkillFilterService } from '../shared/skill-filter.service';
           <span
             class="inline-flex items-center gap-2 rounded-full border border-accent bg-accent/10 px-3.5 py-1.5 font-mono text-[0.72rem] text-accent"
           >
+            <app-tech-icon [name]="active" cls="h-3 w-3" />
             {{ active }}
             <span class="opacity-70">· {{ visible().length }} of {{ total }}</span>
           </span>
@@ -58,49 +61,85 @@ import { SkillFilterService } from '../shared/skill-filter.service';
       <!-- Featured -->
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         @for (p of featured(); track p.name; let i = $index) {
-          <a
+          <div
             appReveal
             [i]="i"
-            [href]="p.repo"
-            target="_blank"
-            rel="noopener noreferrer"
-            [attr.aria-label]="'View the ' + p.name + ' source on GitHub'"
-            class="group u-card flex flex-col p-6 hover:-translate-y-0.5 hover:border-accent/60 md:p-7"
+            class="group u-card relative flex flex-col p-6 hover:-translate-y-0.5 hover:border-accent/60 md:p-7"
           >
-            <div class="flex items-center gap-3">
-              <span class="font-mono text-[0.6875rem] tracking-[0.18em] text-ink-faint">
-                {{ pad(i) }}
-              </span>
-              <span class="h-px w-5 bg-line"></span>
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-[0.6875rem] tracking-[0.18em] text-ink-faint">
+                  {{ pad(i) }}
+                </span>
+                <span class="h-px w-5 bg-line"></span>
+              </div>
+
+              @if (p.live) {
+                <span
+                  class="inline-flex items-center gap-2 rounded-full border border-accent/40 px-2.5 py-0.5 font-mono text-[0.625rem] tracking-[0.16em] text-accent uppercase"
+                >
+                  <span class="relative flex h-1.5 w-1.5">
+                    <span
+                      class="u-pulse-ring absolute inline-flex h-full w-full rounded-full bg-accent"
+                    ></span>
+                    <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent"></span>
+                  </span>
+                  Live
+                </span>
+              }
             </div>
 
-            <h3 class="u-display mt-4 text-2xl text-ink">{{ p.name }}</h3>
+            <h3
+              class="u-display mt-4 text-2xl text-ink transition-colors group-hover:text-accent"
+            >
+              {{ p.name }}
+            </h3>
 
             <p class="mt-2 text-[0.95rem] leading-relaxed text-ink">{{ p.blurb }}</p>
 
             <p class="mt-3 text-[0.85rem] leading-relaxed text-ink-dim">{{ p.detail }}</p>
 
-            <ul class="mt-5 flex flex-wrap gap-1.5">
+            <ul class="mt-5 mb-6 flex flex-wrap gap-1.5">
               @for (t of p.tags; track t) {
                 <li
-                  class="rounded-full border border-line-soft bg-raised px-2.5 py-1 font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint uppercase"
+                  class="inline-flex items-center gap-1.5 rounded-full border border-line-soft bg-raised px-2.5 py-1 font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint uppercase"
                 >
+                  <app-tech-icon [name]="t" cls="h-3 w-3" />
                   {{ t }}
                 </li>
               }
             </ul>
 
-            <span
-              class="mt-6 flex items-center gap-2 border-t border-line-soft pt-4 font-mono text-[0.6875rem] tracking-[0.14em] text-ink-dim uppercase transition-colors group-hover:text-accent"
-            >
-              <app-icon name="github" cls="h-3.5 w-3.5" />
-              View source
-              <app-icon
-                name="arrow-up-right"
-                cls="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </span>
-          </a>
+            <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line-soft pt-4">
+              <a
+                [href]="p.repo"
+                target="_blank"
+                rel="noopener noreferrer"
+                [attr.aria-label]="'View the ' + p.name + ' source on GitHub'"
+                class="inline-flex items-center gap-2 font-mono text-[0.6875rem] tracking-[0.14em] text-ink-dim uppercase transition-colors group-hover:text-accent after:absolute after:inset-0 after:content-['']"
+              >
+                <app-icon name="github" cls="h-3.5 w-3.5" />
+                View source
+                <app-icon
+                  name="arrow-up-right"
+                  cls="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </a>
+
+              @if (p.live; as live) {
+                <a
+                  [href]="live"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  [attr.aria-label]="'Open the live ' + p.name + ' site'"
+                  class="relative z-10 inline-flex min-h-9 items-center gap-1.5 font-mono text-[0.6875rem] tracking-[0.14em] text-accent uppercase transition-opacity hover:opacity-80"
+                >
+                  Visit live
+                  <app-icon name="arrow-up-right" cls="h-3.5 w-3.5" />
+                </a>
+              }
+            </div>
+          </div>
         }
       </div>
 
@@ -137,8 +176,9 @@ import { SkillFilterService } from '../shared/skill-filter.service';
                   <ul class="flex flex-wrap gap-1.5 sm:max-w-[18rem] sm:justify-end">
                     @for (t of p.tags; track t) {
                       <li
-                        class="rounded-full border border-line-soft px-2 py-0.5 font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint uppercase"
+                        class="inline-flex items-center gap-1 rounded-full border border-line-soft px-2 py-0.5 font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint uppercase"
                       >
+                        <app-tech-icon [name]="t" cls="h-2.5 w-2.5" />
                         {{ t }}
                       </li>
                     }
@@ -167,7 +207,7 @@ import { SkillFilterService } from '../shared/skill-filter.service';
 })
 export class ProjectsComponent {
   protected readonly lead =
-    'Side projects I build to keep working through backend architecture problems end to end — messaging, billing logic, API tooling.';
+    'Products I build and ship end to end — a live examination platform, event-driven backends, billing logic, API tooling.';
 
   protected readonly filter = inject(SkillFilterService);
 

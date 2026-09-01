@@ -15,7 +15,15 @@ export type IconName =
   | 'copy'
   | 'check'
   | 'chevron-right'
-  | 'award';
+  | 'award'
+  | 'code'
+  | 'layers'
+  | 'zap'
+  | 'monitor'
+  | 'server'
+  | 'database'
+  | 'terminal'
+  | 'grid';
 
 /**
  * Inline SVG icon set. Stroke icons inherit `currentColor`, so colour comes
@@ -118,6 +126,58 @@ export type IconName =
         <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
           <circle cx="12" cy="9" r="5.5" />
           <path d="m8.6 13.6-1.3 7.2 4.7-2.6 4.7 2.6-1.3-7.2" />
+        </svg>
+      }
+      @case ('code') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <path d="m8 6-6 6 6 6" />
+          <path d="m16 6 6 6-6 6" />
+        </svg>
+      }
+      @case ('layers') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <path d="m12 2.5 9 5-9 5-9-5Z" />
+          <path d="m3 13 9 5 9-5" />
+          <path d="m3 17.5 9 5 9-5" />
+        </svg>
+      }
+      @case ('zap') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <path d="M13 2 3 14h7l-1 8 11-12h-7l1-8Z" />
+        </svg>
+      }
+      @case ('monitor') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <rect x="2.5" y="4" width="19" height="13" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        </svg>
+      }
+      @case ('server') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <rect x="3" y="3.5" width="18" height="7" rx="1.5" />
+          <rect x="3" y="13.5" width="18" height="7" rx="1.5" />
+          <path d="M7 7h.01M7 17h.01" />
+        </svg>
+      }
+      @case ('database') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <ellipse cx="12" cy="5.5" rx="8" ry="3" />
+          <path d="M4 5.5v13c0 1.66 3.58 3 8 3s8-1.34 8-3v-13" />
+          <path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" />
+        </svg>
+      }
+      @case ('terminal') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <path d="m4 17 6-5-6-5" />
+          <path d="M12 19h8" />
+        </svg>
+      }
+      @case ('grid') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+          <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+          <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+          <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
         </svg>
       }
     }

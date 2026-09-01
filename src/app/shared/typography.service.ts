@@ -1,15 +1,24 @@
 import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type FontStyle = 'sans' | 'mono' | 'serif';
+export type FontStyle = 'sans' | 'grotesk' | 'mono' | 'serif' | 'rounded';
 
 const STORAGE_KEY = 'vk-font';
 
+const STYLES: ReadonlyArray<FontStyle> = [
+  'sans',
+  'grotesk',
+  'mono',
+  'serif',
+  'rounded',
+];
+
 /**
- * The three typography styles offered by the header control. Every option
- * maps onto a family that index.html already loads for another purpose
- * (Inter for body, JetBrains Mono for code, Fraunces for display), so
- * switching styles never costs an extra font download.
+ * The typography styles offered by the header control. Inter, JetBrains
+ * Mono and Fraunces were already loaded for the base design; Space Grotesk
+ * and Nunito are the only additions to the font request in index.html.
+ * Each style also restyles the display face (see styles.css), so switching
+ * changes the whole personality of the page, not just the body copy.
  *
  * `stack` is used by the menu to preview each option in its own face.
  */
@@ -22,8 +31,14 @@ export const FONT_OPTIONS: ReadonlyArray<{
   {
     id: 'sans',
     label: 'Modern Sans',
-    family: 'Inter',
+    family: 'Inter + Fraunces',
     stack: '"Inter", ui-sans-serif, system-ui, sans-serif',
+  },
+  {
+    id: 'grotesk',
+    label: 'Geometric Grotesk',
+    family: 'Space Grotesk',
+    stack: '"Space Grotesk", ui-sans-serif, system-ui, sans-serif',
   },
   {
     id: 'mono',
@@ -36,6 +51,12 @@ export const FONT_OPTIONS: ReadonlyArray<{
     label: 'Editorial Serif',
     family: 'Fraunces',
     stack: '"Fraunces", Georgia, "Times New Roman", serif',
+  },
+  {
+    id: 'rounded',
+    label: 'Soft Rounded',
+    family: 'Nunito',
+    stack: '"Nunito", ui-sans-serif, system-ui, sans-serif',
   },
 ];
 
@@ -73,15 +94,11 @@ export class TypographyService {
     if (!this.isBrowser) return 'sans';
 
     const fromDom = document.documentElement.getAttribute('data-font');
-    if (fromDom === 'sans' || fromDom === 'mono' || fromDom === 'serif') {
-      return fromDom;
-    }
+    if (STYLES.includes(fromDom as FontStyle)) return fromDom as FontStyle;
 
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'sans' || stored === 'mono' || stored === 'serif') {
-        return stored;
-      }
+      if (STYLES.includes(stored as FontStyle)) return stored as FontStyle;
     } catch {
       /* ignore */
     }

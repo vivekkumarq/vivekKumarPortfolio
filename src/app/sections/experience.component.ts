@@ -7,6 +7,7 @@ import {
 
 import { EXPERIENCE, type Role } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
+import { TechIconComponent } from '../shared/tech-icon.component';
 import { RevealDirective } from '../shared/reveal.directive';
 import { RichTextComponent } from '../shared/rich-text.component';
 import { SectionComponent } from '../shared/section.component';
@@ -27,7 +28,7 @@ export type ExperienceView = 'quick' | 'deep';
 @Component({
   selector: 'app-role-entry',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, RichTextComponent],
+  imports: [IconComponent, TechIconComponent, RichTextComponent],
   template: `
     <article class="relative border-l border-line pl-6 sm:pl-9">
       <!-- Timeline node, aligned to the role title -->
@@ -148,8 +149,9 @@ export type ExperienceView = 'quick' | 'deep';
       <ul class="mt-8 flex flex-wrap gap-2">
         @for (tech of role().stack; track tech) {
           <li
-            class="rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.6875rem] tracking-[0.06em] text-ink-dim transition-colors hover:border-accent hover:text-accent"
+            class="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.6875rem] tracking-[0.06em] text-ink-dim transition-colors hover:border-accent hover:text-accent"
           >
+            <app-tech-icon [name]="tech" cls="h-3 w-3" />
             {{ tech }}
           </li>
         }

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PROFILE, experienceLabel } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
+import { TechIconComponent } from '../shared/tech-icon.component';
 import { RevealDirective } from '../shared/reveal.directive';
 
 /**
@@ -11,7 +12,7 @@ import { RevealDirective } from '../shared/reveal.directive';
 @Component({
   selector: 'app-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, RevealDirective],
+  imports: [IconComponent, TechIconComponent, RevealDirective],
   template: `
     <section id="top" class="relative overflow-hidden">
       <!-- Backdrop: dot grid, soft glow, faint outline motifs -->
@@ -161,7 +162,11 @@ import { RevealDirective } from '../shared/reveal.directive';
               </div>
               <ul class="ml-4 list-none space-y-0" aria-hidden="true">
                 @for (item of stack; track item) {
-                  <li class="text-accent">- {{ item }}</li>
+                  <li class="flex items-center gap-2 text-accent">
+                    <span class="text-ink-faint">-</span>
+                    <app-tech-icon [name]="item" cls="h-3.5 w-3.5 opacity-90" />
+                    <span>{{ item }}</span>
+                  </li>
                 }
               </ul>
             </dl>

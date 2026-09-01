@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SectionComponent } from '../shared/section.component';
 import { RevealDirective } from '../shared/reveal.directive';
+import { IconComponent } from '../shared/icon.component';
+import { TechIconComponent } from '../shared/tech-icon.component';
 import { SkillFilterService } from '../shared/skill-filter.service';
 import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
 
@@ -20,7 +22,7 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
 @Component({
   selector: 'app-skills',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SectionComponent, RevealDirective],
+  imports: [SectionComponent, RevealDirective, IconComponent, TechIconComponent],
   template: `
     <app-section
       sectionId="skills"
@@ -66,7 +68,10 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
             [i]="$index"
             class="u-card min-w-0 p-5 md:p-6"
           >
-            <h3 class="u-eyebrow">{{ group.group }}</h3>
+            <h3 class="u-eyebrow flex items-center gap-2">
+              <app-icon [name]="group.icon" cls="h-3.5 w-3.5" />
+              {{ group.group }}
+            </h3>
 
             <ul class="mt-4 flex flex-wrap gap-2">
               @for (item of group.items; track item) {
@@ -81,13 +86,15 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
                       "
                       [class]="filter.isActive(item) ? skillActive : skillIdle"
                     >
+                      <app-tech-icon [name]="item" cls="h-3 w-3" />
                       {{ item }}
                       <span class="text-[0.6rem] opacity-70">{{ filter.countFor(item) }}</span>
                     </button>
                   } @else {
                     <span
-                      class="inline-block rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.72rem] text-ink-dim"
+                      class="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.72rem] text-ink-dim"
                     >
+                      <app-tech-icon [name]="item" cls="h-3 w-3" />
                       {{ item }}
                     </span>
                   }
