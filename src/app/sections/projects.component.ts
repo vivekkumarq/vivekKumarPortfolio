@@ -1,12 +1,23 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { PROFILE, PROJECTS, type Project } from '../core/profile';
 import { SectionComponent } from '../shared/section.component';
 import { RevealDirective } from '../shared/reveal.directive';
 import { IconComponent } from '../shared/icon.component';
+import { SkillFilterService } from '../shared/skill-filter.service';
 
 /**
  * Projects showcase. Everything renders from `PROJECTS` in core/profile —
  * featured entries get full cards, the rest collapse into slim rows.
+ *
+ * The list reacts to `SkillFilterService`: when a skill is active in the
+ * section above, only projects tagged with it remain, and a status chip
+ * names the filter with a reset control. Cards re-enter through the same
+ * staggered reveal used on scroll, which doubles as the filter transition.
  *
  * Each card is a single <a> wrapping its content, so nothing inside may be
  * another anchor: the "View source" affordance is a <span>.
@@ -18,14 +29,35 @@ import { IconComponent } from '../shared/icon.component';
   template: `
     <app-section
       sectionId="projects"
-      index="04"
+      index="05"
       eyebrow="Things I've built"
       heading="Projects"
       [lead]="lead"
     >
+      <!-- Active filter chip -->
+      @if (filter.active(); as active) {
+        <div class="mb-8 flex flex-wrap items-center gap-3" role="status">
+          <span
+            class="inline-flex items-center gap-2 rounded-full border border-accent bg-accent/10 px-3.5 py-1.5 font-mono text-[0.72rem] text-accent"
+          >
+            {{ active }}
+            <span class="opacity-70">· {{ visible().length }} of {{ total }}</span>
+          </span>
+
+          <button
+            type="button"
+            (click)="filter.clear()"
+            class="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line px-3.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-dim uppercase transition-colors hover:border-accent hover:text-accent"
+          >
+            <app-icon name="close" cls="h-3 w-3" />
+            Show all
+          </button>
+        </div>
+      }
+
       <!-- Featured -->
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-        @for (p of featured; track p.name; let i = $index) {
+        @for (p of featured(); track p.name; let i = $index) {
           <a
             appReveal
             [i]="i"
@@ -73,14 +105,14 @@ import { IconComponent } from '../shared/icon.component';
       </div>
 
       <!-- Secondary -->
-      @if (others.length) {
+      @if (others().length) {
         <div appReveal class="mt-14">
           <p class="font-mono text-[0.6875rem] tracking-[0.18em] text-ink-faint uppercase">
             Also built
           </p>
 
           <ul class="mt-4 border-t border-line-soft">
-            @for (p of others; track p.name) {
+            @for (p of others(); track p.name) {
               <li>
                 <a
                   [href]="p.repo"
@@ -137,8 +169,24 @@ export class ProjectsComponent {
   protected readonly lead =
     'Side projects I build to keep working through backend architecture problems end to end — messaging, billing logic, API tooling.';
 
-  protected readonly featured: Project[] = PROJECTS.filter((p) => p.featured);
-  protected readonly others: Project[] = PROJECTS.filter((p) => !p.featured);
+  protected readonly filter = inject(SkillFilterService);
+
+  protected readonly total = PROJECTS.length;
+
+  protected readonly visible = computed<Project[]>(() => {
+    const active = this.filter.active();
+    if (!active) return PROJECTS;
+    const key = active.toLowerCase();
+    return PROJECTS.filter((p) => p.tags.some((t) => t.toLowerCase() === key));
+  });
+
+  protected readonly featured = computed<Project[]>(() =>
+    this.visible().filter((p) => p.featured),
+  );
+  protected readonly others = computed<Project[]>(() =>
+    this.visible().filter((p) => !p.featured),
+  );
+
   protected readonly github = PROFILE.github;
 
   /** 0 → "01". Keeps the mono index aligned with the section eyebrow style. */

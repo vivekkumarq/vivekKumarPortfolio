@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-font="sans">
   <head>
     <meta charset="utf-8" />
     <base href="/" />
@@ -34,10 +34,16 @@
           opacity: 1 !important;
           transform: none !important;
         }
+        /* Without JS the experience view toggle can't run — open every
+           collapsed block so all content stays reachable. */
+        .u-collapse {
+          grid-template-rows: 1fr !important;
+        }
       </style>
     </noscript>
 
-    <!-- Applied before first paint so the chosen theme never flashes. -->
+    <!-- Applied before first paint so neither the chosen theme nor the
+         chosen typography style ever flashes its default. -->
     <script>
       (function () {
         try {
@@ -50,6 +56,15 @@
           document.documentElement.setAttribute('data-theme', t);
         } catch (e) {
           document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        try {
+          var f = localStorage.getItem('vk-font');
+          document.documentElement.setAttribute(
+            'data-font',
+            f === 'mono' || f === 'serif' ? f : 'sans'
+          );
+        } catch (e) {
+          document.documentElement.setAttribute('data-font', 'sans');
         }
       })();
     </script>

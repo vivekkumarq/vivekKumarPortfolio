@@ -10,6 +10,51 @@
    without it. See `EXPERIENCE` below.
    ──────────────────────────────────────────────────────────────── */
 
+/* ──────────────── EXPERIENCE CLOCK ──────────────── */
+
+/** First day of the first full-time role. Everything below derives from it. */
+export const CAREER_START = new Date(2022, 8, 1); // 1 September 2022
+
+/**
+ * Completed years since CAREER_START, computed at render time so the site
+ * never advertises stale experience. The prerendered HTML bakes in the
+ * build-day value; hydration recomputes it in the visitor's browser, so
+ * every anniversary the number advances on its own.
+ */
+export function experienceYears(now: Date = new Date()): number {
+  let years = now.getFullYear() - CAREER_START.getFullYear();
+  const anniversary = new Date(
+    now.getFullYear(),
+    CAREER_START.getMonth(),
+    CAREER_START.getDate(),
+  );
+  if (now < anniversary) years -= 1;
+  return Math.max(years, 0);
+}
+
+/** Stat-chip form, e.g. "4+". */
+export function experienceLabel(): string {
+  return `${experienceYears()}+`;
+}
+
+/** Prose form, e.g. "four". Falls back to digits past ten. */
+export function experienceYearsWord(): string {
+  const words = [
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+  ];
+  return words[experienceYears()] ?? String(experienceYears());
+}
+
 export const PROFILE = {
   name: "Vivek Kumar",
   initials: "VK",
@@ -41,8 +86,7 @@ export const PROFILE = {
 
 export const SEO = {
   title: "Vivek Kumar — Software Engineer | Java, Spring Boot, Microservices",
-  description:
-    "Software Engineer with 3+ years building scalable backend microservices in Java, Spring Boot, Quarkus and Kubernetes. Enterprise telecom systems, event-driven architecture with Kafka, GraphQL and REST API design.",
+  description: `Software Engineer with ${experienceLabel()} years building scalable backend microservices in Java, Spring Boot, Quarkus and Kubernetes. Enterprise telecom systems, event-driven architecture with Kafka, GraphQL and REST API design.`,
   keywords: [
     "Vivek Kumar",
     "Java Backend Developer",
@@ -62,12 +106,12 @@ export const ABOUT = {
   /** Paragraphs of the About section. Plain strings; **bold** is supported. */
   paragraphs: [
     "I'm a backend engineer who likes the unglamorous half of software — the part where a service has to stay up, stay fast, and stay understandable a year after it shipped.",
-    "For the past three years at **Netcracker Technology** I've built microservices that run inside enterprise telecom platforms: GraphQL and REST APIs, Kafka-driven event pipelines, and Spring Boot services deployed on Kubernetes. Most of that work sits behind dashboards used by business teams at carriers like **Etisalat**, where a slow query or a dropped event is somebody's workday.",
+    `For the past ${experienceYearsWord()} years at **Netcracker Technology** I've built microservices that run inside enterprise telecom platforms: GraphQL and REST APIs, Kafka-driven event pipelines, and Spring Boot services deployed on Kubernetes. Most of that work sits behind dashboards used by business teams at carriers like **Etisalat**, where a slow query or a dropped event is somebody's workday.`,
     "I care about clean architecture, low-level design, and code that a reviewer can follow without a meeting. Outside of work I build small backend systems end-to-end — order platforms, billing engines, API tooling — mostly to keep pushing on system design.",
   ],
   /** Small stat chips. Keep to 3–4; every number here must be defensible. */
   stats: [
-    { value: "3+", label: "Years Experience" },
+    { value: experienceLabel(), label: "Years Experience" },
     { value: "5+", label: "Business Modules Shipped" },
     { value: "8.5", label: "CGPA / 10" },
     { value: "1", label: "Spotlight Award" },
@@ -94,6 +138,12 @@ export type Role = {
   current: boolean;
   location: string;
   summary: string;
+  /**
+   * The recruiter cut: at most two lines, shown in the timeline's
+   * "Quick view" mode for a 30-second scan. Same facts as `bullets`,
+   * compressed — never claims the full list doesn't back up.
+   */
+  quick: string[];
   bullets: Bullet[];
   stack: string[];
 };
@@ -109,6 +159,10 @@ export const EXPERIENCE: Role[] = [
     location: "Bengaluru, India",
     summary:
       "Backend microservices for enterprise telecom BSS/OSS platforms — API design, event-driven data flow, and production ownership.",
+    quick: [
+      "Design and ship backend microservices in **Java, Spring Boot, GraphQL and PostgreSQL** for enterprise telecom platforms, serving carriers like Etisalat.",
+      "Own REST APIs across **5+ business modules**, Kafka event-driven pipelines, and Docker/Kubernetes deployments with GitLab and Jenkins CI/CD.",
+    ],
     bullets: [
       {
         text: "Designed and built scalable backend microservices in **Java, Spring Boot, GraphQL and PostgreSQL** across enterprise telecom modules serving business users.",
@@ -456,8 +510,8 @@ export const NAV_LINKS = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
   { href: "#open-source", label: "Open Source" },
-  { href: "#projects", label: "Projects" },
   { href: "#skills", label: "Skills" },
+  { href: "#projects", label: "Projects" },
   { href: "#education", label: "Education" },
   { href: "#contact", label: "Contact" },
 ] as const;

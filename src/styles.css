@@ -65,6 +65,24 @@
   color-scheme: light;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Typography styles — data-font on <html>, set before first paint
+   by the bootstrap script in index.html and toggled at runtime by
+   TypographyService. Every option reuses a family the page already
+   loads, so switching costs no extra download.
+   ───────────────────────────────────────────────────────────── */
+
+[data-font="mono"] {
+  --font-sans: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display-weight: 500;
+  --display-track: -0.02em;
+}
+
+[data-font="serif"] {
+  --font-sans: "Fraunces", Georgia, "Times New Roman", serif;
+}
+
 *,
 *::before,
 *::after {
@@ -198,6 +216,22 @@ body {
 .u-reveal.is-in {
   opacity: 1;
   transform: none;
+}
+
+/* Animated collapse — the 0fr→1fr grid-row trick, used by the experience
+   timeline's Quick view / Deep dive switch. Content height is unknown, so
+   max-height hacks would either clip or ease unevenly; grid tracks don't. */
+.u-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.u-collapse.is-open {
+  grid-template-rows: 1fr;
+}
+.u-collapse > * {
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Skills ticker */

@@ -9,6 +9,7 @@ import {
 import { NAV_LINKS, PROFILE } from '../core/profile';
 import { ThemeService } from '../shared/theme.service';
 import { IconComponent } from '../shared/icon.component';
+import { FontMenuComponent } from '../shared/font-menu.component';
 
 /**
  * Sticky header: monogram, anchor nav with scroll-spy, theme toggle,
@@ -20,7 +21,7 @@ import { IconComponent } from '../shared/icon.component';
 @Component({
   selector: 'app-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent],
+  imports: [IconComponent, FontMenuComponent],
   template: `
     <header
       class="fixed inset-x-0 top-0 z-50 transition-colors duration-300"
@@ -68,6 +69,8 @@ import { IconComponent } from '../shared/icon.component';
             <app-icon name="download" cls="h-3.5 w-3.5" />
             Résumé
           </a>
+
+          <app-font-menu />
 
           <button
             type="button"

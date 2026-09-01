@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ABOUT, PROFILE } from '../core/profile';
+import { ABOUT, PROFILE, experienceYearsWord } from '../core/profile';
 import { SectionComponent } from '../shared/section.component';
 import { RevealDirective } from '../shared/reveal.directive';
 import { RichTextComponent } from '../shared/rich-text.component';
 import { IconComponent } from '../shared/icon.component';
+import { CountUpDirective } from '../shared/count-up.directive';
 
 /**
  * Narrative introduction plus a small block of defensible stats.
@@ -12,7 +13,13 @@ import { IconComponent } from '../shared/icon.component';
 @Component({
   selector: 'app-about',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SectionComponent, RevealDirective, RichTextComponent, IconComponent],
+  imports: [
+    SectionComponent,
+    RevealDirective,
+    RichTextComponent,
+    IconComponent,
+    CountUpDirective,
+  ],
   template: `
     <app-section
       sectionId="about"
@@ -52,7 +59,9 @@ import { IconComponent } from '../shared/icon.component';
         <div appReveal [i]="2" class="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line self-start">
           @for (stat of stats; track stat.label) {
             <div class="bg-surface px-5 py-7">
-              <p class="u-display text-4xl text-accent">{{ stat.value }}</p>
+              <p class="u-display text-4xl text-accent" [appCountUp]="stat.value">
+                {{ stat.value }}
+              </p>
               <p class="mt-2 font-mono text-[0.6875rem] leading-4 tracking-[0.1em] text-ink-faint uppercase">
                 {{ stat.label }}
               </p>
@@ -68,6 +77,8 @@ export class AboutComponent {
   protected readonly paragraphs = ABOUT.paragraphs;
   protected readonly stats = ABOUT.stats;
 
-  protected readonly lead =
-    'Three years of backend work in enterprise telecom, and a standing interest in the parts of a system that decide whether it survives contact with production.';
+  protected readonly lead = (() => {
+    const years = experienceYearsWord();
+    return `${years[0].toUpperCase()}${years.slice(1)} years of backend work in enterprise telecom, and a standing interest in the parts of a system that decide whether it survives contact with production.`;
+  })();
 }

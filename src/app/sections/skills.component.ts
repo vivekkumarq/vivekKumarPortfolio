@@ -1,13 +1,16 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SectionComponent } from '../shared/section.component';
 import { RevealDirective } from '../shared/reveal.directive';
+import { SkillFilterService } from '../shared/skill-filter.service';
 import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
 
 /**
  * Skills & competencies.
  *
  * Three blocks, deliberately decreasing in weight:
- *   1. grouped skill pills (the substance)
+ *   1. grouped skill pills (the substance) — pills that map onto at least
+ *      one project are buttons that filter the Projects section below;
+ *      the rest stay plain text rather than offering a dead-end filter
  *   2. a slow marquee strip (texture — the list is rendered twice because
  *      `.u-marquee` translates -50%)
  *   3. core competencies as a light footnote row
@@ -21,11 +24,40 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
   template: `
     <app-section
       sectionId="skills"
-      index="05"
+      index="04"
       eyebrow="Toolkit"
       heading="Skills &amp; Competencies"
       [lead]="lead"
     >
+      <!-- Filter state row -->
+      <div appReveal class="mb-6 flex min-h-9 flex-wrap items-center gap-x-3 gap-y-2">
+        <button
+          type="button"
+          (click)="filter.clear()"
+          [attr.aria-pressed]="filter.active() === null"
+          [class]="filter.active() === null ? pillActive : pillIdle"
+        >
+          All skills
+        </button>
+
+        @if (filter.active(); as active) {
+          <p class="text-[0.8125rem] text-ink-dim" role="status">
+            Filtering projects by
+            <span class="font-mono text-accent">{{ active }}</span>
+            —
+            <a href="#projects" class="u-link-underline text-ink transition-colors hover:text-accent">
+              see them below ↓
+            </a>
+          </p>
+        } @else {
+          <p class="text-[0.8125rem] text-ink-faint">
+            Skills with a
+            <span class="font-mono text-ink-dim">count</span>
+            filter the projects section — click one.
+          </p>
+        }
+      </div>
+
       <!-- 1 ─ Skill groups -->
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         @for (group of groups; track group.group) {
@@ -38,12 +70,27 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
 
             <ul class="mt-4 flex flex-wrap gap-2">
               @for (item of group.items; track item) {
-                <li
-                  class="rounded-full border border-line bg-raised px-3 py-1
-                         font-mono text-[0.72rem] text-ink-dim
-                         transition-colors hover:border-accent hover:text-accent"
-                >
-                  {{ item }}
+                <li>
+                  @if (filter.isFilterable(item)) {
+                    <button
+                      type="button"
+                      (click)="filter.toggle(item)"
+                      [attr.aria-pressed]="filter.isActive(item)"
+                      [attr.aria-label]="
+                        'Filter projects by ' + item + ' (' + filter.countFor(item) + ')'
+                      "
+                      [class]="filter.isActive(item) ? skillActive : skillIdle"
+                    >
+                      {{ item }}
+                      <span class="text-[0.6rem] opacity-70">{{ filter.countFor(item) }}</span>
+                    </button>
+                  } @else {
+                    <span
+                      class="inline-block rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.72rem] text-ink-dim"
+                    >
+                      {{ item }}
+                    </span>
+                  }
                 </li>
               }
             </ul>
@@ -123,7 +170,19 @@ export class SkillsComponent {
   protected readonly lead =
     'The stack I work in day to day — backend services, APIs and messaging, plus the build and deployment tooling around them.';
 
+  protected readonly filter = inject(SkillFilterService);
+
   protected readonly groups = SKILLS;
   protected readonly ticker = SKILL_TICKER;
   protected readonly competencies = COMPETENCIES;
+
+  /* Pill styling, shared between the reset control and the skill buttons. */
+  protected readonly pillActive =
+    'rounded-full border border-accent bg-accent/10 px-3.5 py-1 font-mono text-[0.72rem] text-accent transition-colors';
+  protected readonly pillIdle =
+    'rounded-full border border-line bg-raised px-3.5 py-1 font-mono text-[0.72rem] text-ink-dim transition-colors hover:border-accent hover:text-accent';
+  protected readonly skillActive =
+    'inline-flex items-center gap-1.5 rounded-full border border-accent bg-accent/10 px-3 py-1 font-mono text-[0.72rem] text-accent transition-colors';
+  protected readonly skillIdle =
+    'inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.72rem] text-ink-dim transition-colors hover:border-accent hover:text-accent';
 }

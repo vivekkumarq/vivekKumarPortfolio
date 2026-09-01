@@ -1,24 +1,28 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   input,
   signal,
 } from '@angular/core';
 
-import { EXPERIENCE, type Bullet, type Role } from '../core/profile';
+import { EXPERIENCE, type Role } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
 import { RevealDirective } from '../shared/reveal.directive';
 import { RichTextComponent } from '../shared/rich-text.component';
 import { SectionComponent } from '../shared/section.component';
 
+/** Section-level detail switch, owned by ExperienceComponent. */
+export type ExperienceView = 'quick' | 'deep';
+
 /**
  * One entry on the experience timeline.
  *
- * Lives here rather than in `shared/` because nothing else needs it. It is a
- * separate component purely so that the "show all / show less" state is owned
- * per role — with N roles a single shared flag would expand every one of them
- * at once.
+ * Renders both cuts of the role and lets the animated `.u-collapse`
+ * containers swap between them: `quick` is the recruiter scan (two lines,
+ * no summary), `deep` is the full record — summary, every bullet with its
+ * metric chip, and the architecture detail. Both blocks stay in the DOM so
+ * the prerendered HTML always carries the complete content; the collapsed
+ * one is `inert`, keeping it out of tab order and screen readers.
  */
 @Component({
   selector: 'app-role-entry',
@@ -81,56 +85,65 @@ import { SectionComponent } from '../shared/section.component';
         </div>
       </header>
 
-      <p class="mt-5 max-w-2xl text-[0.95rem] leading-relaxed text-ink-dim">
-        {{ role().summary }}
-      </p>
-
-      <ul class="mt-7 space-y-3.5">
-        @for (bullet of visibleBullets(); track bullet.text) {
-          <li class="flex gap-3">
-            <span class="mt-[0.3rem] shrink-0 text-accent">
-              <app-icon name="chevron-right" cls="h-3.5 w-3.5" />
-            </span>
-
-            <div class="min-w-0">
-              <p class="text-[0.925rem] leading-relaxed text-ink-dim">
-                <app-rich [text]="bullet.text" />
-              </p>
-
-              @if (bullet.metric; as metric) {
-                <span
-                  class="mt-2 inline-flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-md border border-line bg-raised px-2.5 py-1"
-                >
-                  <span class="font-mono text-sm text-accent">{{ metric.value }}</span>
-                  <span class="text-[0.6875rem] text-ink-faint">{{ metric.label }}</span>
+      <!-- Quick view: the 30-second scan -->
+      <div
+        class="u-collapse"
+        [class.is-open]="mode() === 'quick'"
+        [attr.inert]="mode() === 'quick' ? null : ''"
+      >
+        <div>
+          <ul class="mt-6 space-y-3">
+            @for (line of role().quick; track line) {
+              <li class="flex gap-3">
+                <span class="mt-[0.3rem] shrink-0 text-accent">
+                  <app-icon name="chevron-right" cls="h-3.5 w-3.5" />
                 </span>
-              }
-            </div>
-          </li>
-        }
-      </ul>
+                <p class="text-[0.95rem] leading-relaxed text-ink-dim">
+                  <app-rich [text]="line" />
+                </p>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
 
-      @if (role().bullets.length > preview) {
-        <button
-          type="button"
-          (click)="toggle()"
-          [attr.aria-expanded]="expanded()"
-          class="mt-3 -mx-2 inline-flex min-h-11 items-center gap-2 px-2 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-accent"
-        >
-          @if (expanded()) {
-            Show less
-          } @else {
-            Show all {{ role().bullets.length }}
-          }
-          <span
-            class="inline-flex transition-transform duration-300"
-            [class.-rotate-90]="expanded()"
-            [class.rotate-90]="!expanded()"
-          >
-            <app-icon name="chevron-right" cls="h-3.5 w-3.5" />
-          </span>
-        </button>
-      }
+      <!-- Deep dive: summary, every bullet, metric chips -->
+      <div
+        class="u-collapse"
+        [class.is-open]="mode() === 'deep'"
+        [attr.inert]="mode() === 'deep' ? null : ''"
+      >
+        <div>
+          <p class="mt-5 max-w-2xl text-[0.95rem] leading-relaxed text-ink-dim">
+            {{ role().summary }}
+          </p>
+
+          <ul class="mt-6 space-y-3.5">
+            @for (bullet of role().bullets; track bullet.text) {
+              <li class="flex gap-3">
+                <span class="mt-[0.3rem] shrink-0 text-accent">
+                  <app-icon name="chevron-right" cls="h-3.5 w-3.5" />
+                </span>
+
+                <div class="min-w-0">
+                  <p class="text-[0.925rem] leading-relaxed text-ink-dim">
+                    <app-rich [text]="bullet.text" />
+                  </p>
+
+                  @if (bullet.metric; as metric) {
+                    <span
+                      class="mt-2 inline-flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-md border border-line bg-raised px-2.5 py-1"
+                    >
+                      <span class="font-mono text-sm text-accent">{{ metric.value }}</span>
+                      <span class="text-[0.6875rem] text-ink-faint">{{ metric.label }}</span>
+                    </span>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
 
       <ul class="mt-8 flex flex-wrap gap-2">
         @for (tech of role().stack; track tech) {
@@ -146,24 +159,12 @@ import { SectionComponent } from '../shared/section.component';
 })
 export class RoleEntryComponent {
   readonly role = input.required<Role>();
-
-  /** Bullets shown before the reader asks for the rest. */
-  protected readonly preview = 5;
-
-  protected readonly expanded = signal<boolean>(false);
-
-  protected readonly visibleBullets = computed<Bullet[]>(() => {
-    const bullets = this.role().bullets;
-    return this.expanded() ? bullets : bullets.slice(0, this.preview);
-  });
-
-  protected toggle(): void {
-    this.expanded.update((open) => !open);
-  }
+  readonly mode = input.required<ExperienceView>();
 }
 
 /**
- * Experience section — a vertical timeline over `EXPERIENCE`.
+ * Experience section — a vertical timeline over `EXPERIENCE`, with a
+ * section-level switch between the recruiter cut and the full record.
  */
 @Component({
   selector: 'app-experience',
@@ -177,10 +178,43 @@ export class RoleEntryComponent {
       heading="Experience"
       [lead]="lead"
     >
+      <!-- View-mode switch -->
+      <div appReveal class="mb-10 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div
+          role="group"
+          aria-label="Experience detail level"
+          class="inline-flex rounded-full border border-line bg-surface p-1"
+        >
+          <button
+            type="button"
+            (click)="mode.set('quick')"
+            [attr.aria-pressed]="mode() === 'quick'"
+            [class]="mode() === 'quick' ? segActive : segIdle"
+          >
+            Quick view
+          </button>
+          <button
+            type="button"
+            (click)="mode.set('deep')"
+            [attr.aria-pressed]="mode() === 'deep'"
+            [class]="mode() === 'deep' ? segActive : segIdle"
+          >
+            Deep dive
+          </button>
+        </div>
+
+        <p
+          class="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-faint uppercase"
+          role="status"
+        >
+          {{ mode() === 'quick' ? 'The 30-second scan' : 'Architecture, ownership and detail' }}
+        </p>
+      </div>
+
       <div class="space-y-16">
         @for (role of experience; track role.company) {
           <div appReveal [i]="$index">
-            <app-role-entry [role]="role" />
+            <app-role-entry [role]="role" [mode]="mode()" />
           </div>
         }
       </div>
@@ -192,4 +226,11 @@ export class ExperienceComponent {
     'Software Engineer at Netcracker Technology since September 2022, building backend microservices for enterprise telecom BSS/OSS platforms.';
 
   protected readonly experience: Role[] = EXPERIENCE;
+
+  protected readonly mode = signal<ExperienceView>('quick');
+
+  protected readonly segActive =
+    'rounded-full bg-accent px-4 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-canvas transition-colors';
+  protected readonly segIdle =
+    'rounded-full px-4 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-dim transition-colors hover:text-ink';
 }

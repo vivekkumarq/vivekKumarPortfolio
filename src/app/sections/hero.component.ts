@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { PROFILE } from '../core/profile';
+import { PROFILE, experienceLabel } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
 import { RevealDirective } from '../shared/reveal.directive';
 
@@ -187,7 +187,7 @@ export class HeroComponent {
     { key: 'role', value: PROFILE.role },
     { key: 'company', value: PROFILE.company },
     { key: 'location', value: PROFILE.location },
-    { key: 'experience', value: '3+ years' },
+    { key: 'experience', value: `${experienceLabel()} years` },
     { key: 'focus', value: 'backend · distributed systems' },
   ] as const;
 

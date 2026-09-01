@@ -42,8 +42,10 @@ import { FooterComponent } from './sections/footer.component';
       <app-about />
       <app-experience />
       <app-open-source />
-      <app-projects />
+      <!-- Skills come before Projects so the skill pills filter a section
+           the reader is about to reach, not one they already scrolled past. -->
       <app-skills />
+      <app-projects />
       <app-education />
       <app-contact />
     </main>
