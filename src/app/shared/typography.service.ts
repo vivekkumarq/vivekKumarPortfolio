@@ -1,7 +1,13 @@
 import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type FontStyle = 'sans' | 'grotesk' | 'mono' | 'serif' | 'rounded';
+export type FontStyle =
+  | 'sans'
+  | 'grotesk'
+  | 'mono'
+  | 'serif'
+  | 'rounded'
+  | 'script';
 
 const STORAGE_KEY = 'vk-font';
 
@@ -11,6 +17,7 @@ const STYLES: ReadonlyArray<FontStyle> = [
   'mono',
   'serif',
   'rounded',
+  'script',
 ];
 
 /**
@@ -57,6 +64,12 @@ export const FONT_OPTIONS: ReadonlyArray<{
     label: 'Soft Rounded',
     family: 'Nunito',
     stack: '"Nunito", ui-sans-serif, system-ui, sans-serif',
+  },
+  {
+    id: 'script',
+    label: 'Handwritten',
+    family: 'Caveat + Nunito',
+    stack: '"Caveat", "Segoe Script", cursive',
   },
 ];
 

@@ -97,6 +97,15 @@
   --display-track: -0.02em;
 }
 
+/* Handwritten headings over a soft, legible body — Caveat carries the
+   display voice only; paragraphs in a script face would be unreadable. */
+[data-font="script"] {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Caveat", "Segoe Script", cursive;
+  --display-weight: 600;
+  --display-track: 0em;
+}
+
 *,
 *::before,
 *::after {

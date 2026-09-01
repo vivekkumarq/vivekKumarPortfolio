@@ -19,7 +19,7 @@
          font-optical-sizing: auto by default, so the hero picks up the
          display cut and the smaller headings the text cut, automatically. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Fraunces:opsz,wght@9..144,100..900&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&family=Nunito:wght@300..800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Fraunces:opsz,wght@9..144,100..900&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300..700&family=Nunito:wght@300..800&family=Caveat:wght@400..700&display=swap"
       rel="stylesheet"
     />
 
@@ -61,7 +61,9 @@
           var f = localStorage.getItem('vk-font');
           document.documentElement.setAttribute(
             'data-font',
-            ['grotesk', 'mono', 'serif', 'rounded'].indexOf(f) >= 0 ? f : 'sans'
+            ['grotesk', 'mono', 'serif', 'rounded', 'script'].indexOf(f) >= 0
+              ? f
+              : 'sans'
           );
         } catch (e) {
           document.documentElement.setAttribute('data-font', 'sans');
