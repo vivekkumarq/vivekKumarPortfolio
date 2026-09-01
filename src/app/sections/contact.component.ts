@@ -134,13 +134,6 @@ export class ContactComponent {
       external: false,
     },
     {
-      icon: 'phone',
-      label: 'Phone',
-      value: PROFILE.phone,
-      href: `tel:${PROFILE.phone.replace(/\s/g, '')}`,
-      external: false,
-    },
-    {
       icon: 'linkedin',
       label: 'LinkedIn',
       value: 'in/vivek-k-87036b104',

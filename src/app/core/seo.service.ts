@@ -63,7 +63,6 @@ export class SeoService {
       jobTitle: PROFILE.role,
       description: SEO.description,
       email: `mailto:${PROFILE.email}`,
-      telephone: PROFILE.phone,
       url: PROFILE.siteUrl,
       worksFor: { '@type': 'Organization', name: PROFILE.company },
       address: {

@@ -20,7 +20,6 @@ export const PROFILE = {
   company: "Netcracker Technology",
   location: "Bengaluru, India",
   email: "vkumar.vivek222@gmail.com",
-  phone: "+91 74043 09721",
   github: "https://github.com/vivekkumarq",
   githubHandle: "vivekkumarq",
   linkedin: "https://www.linkedin.com/in/vivek-k-87036b104/",
@@ -287,8 +286,19 @@ export const OPEN_SOURCE: OpenSourceProject[] = [
       "Generates API clients, server stubs and documentation from an OpenAPI specification.",
     repoUrl: "https://github.com/OpenAPITools/openapi-generator",
     stars: "26.7k",
-    tags: ["Kotlin", "Mustache", "Code Generation"],
+    tags: ["Kotlin", "Rust", "Mustache", "Code Generation"],
     contributions: [
+      {
+        kind: "pr",
+        number: 24819,
+        title: "Parse the client example's port argument as u16 in rust-server output",
+        url: "https://github.com/OpenAPITools/openapi-generator/pull/24819",
+        status: "merged",
+        detail:
+          "Every client example the rust-server generator produced panicked on startup: clap stored the port argument as a String, while the code building the base URL read it back as a u16. The argument now carries a u16 value parser, so the examples run — and a non-numeric port is rejected at parse time with a clear message instead of a crash.",
+        diff: "+9 across 9 files",
+        meta: "Closes #24515",
+      },
       {
         kind: "pr",
         number: 24810,
@@ -299,6 +309,28 @@ export const OPEN_SOURCE: OpenSourceProject[] = [
           "The Kotlin jaxrs-spec generator emitted API interfaces carrying only JAX-RS annotations, so operations documented in the spec arrived undocumented in the generated code — while the equivalent Java generator had always produced Javadoc. The template now builds a KDoc block from the operation summary and notes, with @param for documented parameters and @return for the responses.",
         diff: "+181 across 6 files",
         meta: "Closes #24794 · ships in 7.26.0",
+      },
+    ],
+  },
+  {
+    project: "quarkus",
+    owner: "quarkusio",
+    description:
+      "Supersonic Subatomic Java — a Kubernetes-native framework built for fast boot and low memory.",
+    repoUrl: "https://github.com/quarkusio/quarkus",
+    stars: "15.9k",
+    tags: ["Java", "JSON-B", "Yasson"],
+    contributions: [
+      {
+        kind: "issue",
+        number: 56091,
+        title: "Record deserialization failure traced to a JDK 22 reflection regression",
+        url: "https://github.com/quarkusio/quarkus/issues/56091",
+        status: "resolved",
+        detail:
+          "Reproduced a JSON-B record-deserialization failure reported against Quarkus using plain Yasson with no framework involved, then isolated it across runtime JDKs with identical class files: Parameter#getParameterizedType() returns the raw type for a record's canonical constructor parameters on JDK 22, but not on 21 or 25. The diagnosis — a JDK regression, not a Quarkus bug — closed the issue.",
+        diff: null,
+        meta: "Diagnosis confirmed by the reporter · issue closed",
       },
     ],
   },
