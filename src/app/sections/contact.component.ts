@@ -49,7 +49,9 @@ type Channel = {
 
           <div class="mt-8 flex flex-wrap gap-3">
             <a
-              [href]="'mailto:' + profile.email"
+              [href]="profile.emailUrl"
+              target="_blank"
+              rel="noopener noreferrer"
               class="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-canvas transition-opacity hover:opacity-90"
             >
               <app-icon name="mail" cls="h-4 w-4" />
@@ -130,8 +132,8 @@ export class ContactComponent {
       icon: 'mail',
       label: 'Email',
       value: PROFILE.email,
-      href: `mailto:${PROFILE.email}`,
-      external: false,
+      href: PROFILE.emailUrl,
+      external: true,
     },
     {
       icon: 'linkedin',

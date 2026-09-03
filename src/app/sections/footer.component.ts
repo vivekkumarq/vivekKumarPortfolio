@@ -38,7 +38,9 @@ import { IconComponent } from '../shared/icon.component';
             <app-icon name="linkedin" cls="h-4 w-4" />
           </a>
           <a
-            [href]="'mailto:' + profile.email"
+            [href]="profile.emailUrl"
+            target="_blank"
+            rel="noopener noreferrer"
             class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-faint transition-colors hover:border-accent hover:text-accent"
             aria-label="Send an email"
           >

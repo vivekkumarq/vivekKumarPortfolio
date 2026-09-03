@@ -67,6 +67,14 @@ export const PROFILE = {
   company: "Netcracker Technology",
   location: "Bengaluru, India",
   email: "vkumar.vivek222@gmail.com",
+  /**
+   * The clickable mail link. mailto: silently does nothing for visitors
+   * without a desktop mail client configured — most of them — so every
+   * button opens a pre-addressed Gmail compose window instead. mailto:
+   * remains only in the JSON-LD, where schema.org expects it.
+   */
+  emailUrl:
+    "https://mail.google.com/mail/?view=cm&fs=1&to=vkumar.vivek222@gmail.com",
   github: "https://github.com/vivekkumarq",
   githubHandle: "vivekkumarq",
   linkedin: "https://www.linkedin.com/in/vivek-k-87036b104/",

@@ -43,7 +43,9 @@ import { CountUpDirective } from '../shared/count-up.directive';
 
           <div appReveal [i]="paragraphs.length" class="pt-3">
             <a
-              [href]="'mailto:' + profile.email"
+              [href]="profile.emailUrl"
+              target="_blank"
+              rel="noopener noreferrer"
               class="group -mx-2 inline-flex min-h-11 items-center gap-2 px-2 font-mono text-[0.8125rem] text-accent"
             >
               <span class="u-link-underline">{{ profile.availability }}</span>
