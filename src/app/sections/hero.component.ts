@@ -71,7 +71,11 @@ import { RevealDirective } from '../shared/reveal.directive';
 
           <p appReveal [i]="1" class="u-eyebrow mb-6">{{ profile.role }}</p>
 
-          <h1 appReveal [i]="2" class="u-display text-[clamp(3rem,10vw,5.5rem)] text-ink">
+          <h1
+            appReveal
+            [i]="2"
+            class="u-display u-gradient-text text-[clamp(3rem,10vw,5.5rem)] text-ink"
+          >
             {{ profile.name }}
           </h1>
 

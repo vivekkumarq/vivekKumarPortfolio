@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SectionComponent } from '../shared/section.component';
 import { RevealDirective } from '../shared/reveal.directive';
 import { IconComponent } from '../shared/icon.component';
-import { EDUCATION, AWARDS } from '../core/profile';
+import { EDUCATION, AWARDS, CERTIFICATIONS } from '../core/profile';
 
 /**
- * Education & recognition.
+ * Education, recognition, and verifiable credentials.
  *
- * Two restrained columns on `lg`, stacked below. `AWARDS` entries may carry an
- * empty `year`, so the year is guarded — no dangling separators.
+ * Two restrained columns on `lg`, stacked below, with the certification grid
+ * full-width beneath them. `AWARDS` entries may carry an empty `year`, so the
+ * year is guarded — no dangling separators.
  */
 @Component({
   selector: 'app-education',
@@ -19,7 +20,7 @@ import { EDUCATION, AWARDS } from '../core/profile';
       sectionId="education"
       index="06"
       eyebrow="Background"
-      heading="Education &amp; Recognition"
+      heading="Education, Recognition &amp; Credentials"
       [lead]="lead"
     >
       <div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
@@ -84,13 +85,59 @@ import { EDUCATION, AWARDS } from '../core/profile';
           </ul>
         </div>
       </div>
+
+      <!-- Certifications. Each card is a link to its public credential, so
+           the claim is checkable rather than asserted. -->
+      <div appReveal class="mt-12 border-t border-line-soft pt-10">
+        <p class="u-eyebrow">Certifications</p>
+
+        <ul class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          @for (cert of certifications; track cert.url) {
+            <li appReveal [i]="$index">
+              <a
+                [href]="cert.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group u-card u-lift flex h-full min-w-0 items-start gap-3 p-4 hover:border-accent"
+              >
+                <span
+                  class="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-accent/40 text-accent"
+                >
+                  <app-icon name="check" cls="h-3.5 w-3.5" />
+                </span>
+
+                <span class="min-w-0 flex-1">
+                  <span
+                    class="block text-[0.9375rem] leading-snug font-medium text-ink transition-colors group-hover:text-accent"
+                  >
+                    {{ cert.title }}
+                  </span>
+                  <span
+                    class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.65rem] tracking-[0.12em] text-ink-faint uppercase"
+                  >
+                    <span class="truncate">{{ cert.org }}</span>
+                    <span class="h-1 w-1 shrink-0 rounded-full bg-accent opacity-50"></span>
+                    <span>{{ cert.year }}</span>
+                  </span>
+                </span>
+
+                <app-icon
+                  name="arrow-up-right"
+                  cls="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-faint transition-all group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
     </app-section>
   `,
 })
 export class EducationComponent {
   protected readonly lead =
-    'Formal computer science background, and the recognition received for work delivered since.';
+    'Formal computer science background, the recognition received for work delivered since, and credentials anyone can verify.';
 
   protected readonly education: typeof EDUCATION = EDUCATION;
   protected readonly awards: typeof AWARDS = AWARDS;
+  protected readonly certifications: typeof CERTIFICATIONS = CERTIFICATIONS;
 }

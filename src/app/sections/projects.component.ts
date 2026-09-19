@@ -64,7 +64,7 @@ import { SkillFilterService } from '../shared/skill-filter.service';
           <div
             appReveal
             [i]="i"
-            class="group u-card relative flex flex-col p-6 hover:-translate-y-0.5 hover:border-accent/60 md:p-7"
+            class="group u-card u-lift relative flex flex-col p-6 hover:border-accent/60 md:p-7"
           >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3">
@@ -152,28 +152,52 @@ import { SkillFilterService } from '../shared/skill-filter.service';
 
           <ul class="mt-4 border-t border-line-soft">
             @for (p of others(); track p.name) {
-              <li>
-                <a
-                  [href]="p.repo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  [attr.aria-label]="'View the ' + p.name + ' source on GitHub'"
-                  class="group flex flex-col gap-2 border-b border-line-soft py-5 transition-colors hover:border-accent/50 sm:flex-row sm:items-baseline sm:gap-6"
-                >
-                  <div class="min-w-0 sm:flex-1">
-                    <h3
-                      class="flex items-center gap-2 text-[0.95rem] font-medium text-ink transition-colors group-hover:text-accent"
+              <!-- The repo link is stretched across the row, so a "Visit live"
+                   link can sit beside it without nesting anchors. -->
+              <li
+                class="group relative flex flex-col gap-2 border-b border-line-soft py-5 transition-colors hover:border-accent/50 sm:flex-row sm:items-baseline sm:gap-6"
+              >
+                <div class="min-w-0 sm:flex-1">
+                  <h3
+                    class="flex items-center gap-2 text-[0.95rem] font-medium text-ink transition-colors group-hover:text-accent"
+                  >
+                    <a
+                      [href]="p.repo"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      [attr.aria-label]="'View the ' + p.name + ' source on GitHub'"
+                      class="after:absolute after:inset-0 after:content-['']"
                     >
                       {{ p.name }}
-                      <app-icon
-                        name="arrow-up-right"
-                        cls="h-3.5 w-3.5 shrink-0 text-ink-faint transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      />
-                    </h3>
-                    <p class="mt-1 text-[0.85rem] leading-relaxed text-ink-dim">{{ p.blurb }}</p>
-                  </div>
+                    </a>
+                    <app-icon
+                      name="arrow-up-right"
+                      cls="h-3.5 w-3.5 shrink-0 text-ink-faint transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  </h3>
+                  <p class="mt-1 text-[0.85rem] leading-relaxed text-ink-dim">{{ p.blurb }}</p>
+                </div>
 
-                  <ul class="flex flex-wrap gap-1.5 sm:max-w-[18rem] sm:justify-end">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 sm:max-w-[20rem] sm:justify-end">
+                  @if (p.live; as live) {
+                    <a
+                      [href]="live"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      [attr.aria-label]="'Open the live ' + p.name + ' site'"
+                      class="relative z-10 inline-flex min-h-9 shrink-0 items-center gap-1.5 font-mono text-[0.625rem] tracking-[0.14em] text-accent uppercase transition-opacity hover:opacity-80"
+                    >
+                      <span class="relative flex h-1.5 w-1.5">
+                        <span
+                          class="u-pulse-ring absolute inline-flex h-full w-full rounded-full bg-accent"
+                        ></span>
+                        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent"></span>
+                      </span>
+                      Live
+                    </a>
+                  }
+
+                  <ul class="flex flex-wrap gap-1.5 sm:justify-end">
                     @for (t of p.tags; track t) {
                       <li
                         class="inline-flex items-center gap-1 rounded-full border border-line-soft px-2 py-0.5 font-mono text-[0.625rem] tracking-[0.12em] text-ink-faint uppercase"
@@ -183,7 +207,7 @@ import { SkillFilterService } from '../shared/skill-filter.service';
                       </li>
                     }
                   </ul>
-                </a>
+                </div>
               </li>
             }
           </ul>
@@ -207,7 +231,7 @@ import { SkillFilterService } from '../shared/skill-filter.service';
 })
 export class ProjectsComponent {
   protected readonly lead =
-    'Products I build and ship end to end — a live examination platform, event-driven backends, billing logic, API tooling.';
+    'Products I build and ship end to end — a live examination platform, event-driven backends, billing logic, API tooling, and learning platforms used in the open.';
 
   protected readonly filter = inject(SkillFilterService);
 

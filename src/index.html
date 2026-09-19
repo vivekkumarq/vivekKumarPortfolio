@@ -48,7 +48,9 @@
       (function () {
         try {
           var t = localStorage.getItem('vk-theme');
-          if (t !== 'light' && t !== 'dark') {
+          if (
+            ['dark', 'light', 'ocean', 'ember', 'violet', 'sand'].indexOf(t) < 0
+          ) {
             t = window.matchMedia('(prefers-color-scheme: light)').matches
               ? 'light'
               : 'dark';

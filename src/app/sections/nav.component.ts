@@ -7,21 +7,22 @@ import {
   signal,
 } from '@angular/core';
 import { NAV_LINKS, PROFILE } from '../core/profile';
-import { ThemeService } from '../shared/theme.service';
 import { IconComponent } from '../shared/icon.component';
 import { FontMenuComponent } from '../shared/font-menu.component';
+import { ThemeMenuComponent } from '../shared/theme-menu.component';
 
 /**
- * Sticky header: monogram, anchor nav with scroll-spy, theme toggle,
- * resume link, and a mobile sheet.
+ * Sticky header: monogram, anchor nav with scroll-spy, typography and theme
+ * menus, resume link, a reading-progress rail, and a mobile sheet.
  *
- * Scroll-spy and the scrolled-state border are wired in `afterNextRender`,
- * which only runs in the browser — the prerendered HTML is unaffected.
+ * Scroll-spy, progress, and the scrolled-state border are wired in
+ * `afterNextRender`, which only runs in the browser — the prerendered HTML
+ * is unaffected.
  */
 @Component({
   selector: 'app-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, FontMenuComponent],
+  imports: [IconComponent, FontMenuComponent, ThemeMenuComponent],
   template: `
     <header
       class="fixed inset-x-0 top-0 z-50 transition-colors duration-300"
@@ -72,20 +73,7 @@ import { FontMenuComponent } from '../shared/font-menu.component';
 
           <app-font-menu />
 
-          <button
-            type="button"
-            (click)="theme.toggle()"
-            class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-dim transition-colors hover:border-accent hover:text-accent md:h-9 md:w-9"
-            [attr.aria-label]="
-              theme.theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
-            "
-          >
-            @if (theme.theme() === 'dark') {
-              <app-icon name="sun" cls="h-4 w-4" />
-            } @else {
-              <app-icon name="moon" cls="h-4 w-4" />
-            }
-          </button>
+          <app-theme-menu />
 
           <button
             type="button"
@@ -103,6 +91,16 @@ import { FontMenuComponent } from '../shared/font-menu.component';
           </button>
         </div>
       </nav>
+
+      <!-- Reading progress. Purely decorative, so it is hidden from
+           assistive tech and sits flush with the header's bottom edge. -->
+      <div class="absolute inset-x-0 bottom-0 h-px" aria-hidden="true">
+        <div
+          class="h-full origin-left bg-accent transition-opacity duration-300"
+          [style.transform]="'scaleX(' + progress() + ')'"
+          [style.opacity]="scrolled() ? 1 : 0"
+        ></div>
+      </div>
 
       <!-- Mobile sheet -->
       @if (menuOpen()) {
@@ -142,7 +140,6 @@ import { FontMenuComponent } from '../shared/font-menu.component';
   `,
 })
 export class NavComponent {
-  protected readonly theme = inject(ThemeService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly links = NAV_LINKS;
@@ -152,6 +149,8 @@ export class NavComponent {
   protected readonly menuOpen = signal(false);
   protected readonly scrolled = signal(false);
   protected readonly active = signal<string>('');
+  /** 0–1 share of the scrollable page already read. */
+  protected readonly progress = signal(0);
 
   constructor() {
     afterNextRender(() => {
@@ -160,9 +159,19 @@ export class NavComponent {
     });
   }
 
-  /** Header grows a border and a blur once the page leaves the top. */
+  /** Header grows a border and a blur once the page leaves the top, and the
+   *  progress rail tracks how far down the document the reader is. */
   private watchScroll(): void {
-    const onScroll = () => this.scrolled.set(window.scrollY > 12);
+    const onScroll = () => {
+      this.scrolled.set(window.scrollY > 12);
+      // A page shorter than the viewport has nothing to scroll; treat it as
+      // fully read rather than dividing by zero.
+      const scrollable =
+        document.documentElement.scrollHeight - window.innerHeight;
+      this.progress.set(
+        scrollable > 0 ? Math.min(1, window.scrollY / scrollable) : 1,
+      );
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     this.destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));

@@ -65,6 +65,78 @@
   color-scheme: light;
 }
 
+/* Additional palettes. Each redefines the same tokens, so every component
+   follows without knowing a theme exists. `:root` supplies the dark defaults,
+   which is why the dark variants only restate what actually differs. */
+
+[data-theme="ocean"] {
+  --c-canvas: #080d14;
+  --c-surface: #0d141e;
+  --c-raised: #121b27;
+  --c-line: #1e2c3d;
+  --c-line-soft: #16202c;
+  --c-ink: #e6edf5;
+  --c-ink-dim: #93a5b8;
+  --c-ink-faint: #64778a;
+  --c-accent: #4cc4f0;
+  --c-accent-dim: #1d5f7d;
+  --c-gold: #d9a441;
+  --dot: rgba(120, 190, 255, 0.06);
+  --glow: rgba(76, 196, 240, 0.1);
+  color-scheme: dark;
+}
+
+[data-theme="ember"] {
+  --c-canvas: #100c0a;
+  --c-surface: #17120f;
+  --c-raised: #1e1814;
+  --c-line: #332921;
+  --c-line-soft: #241d18;
+  --c-ink: #f2ebe4;
+  --c-ink-dim: #b3a396;
+  --c-ink-faint: #82756a;
+  --c-accent: #f0a35e;
+  --c-accent-dim: #7d4f26;
+  --c-gold: #e0b85c;
+  --dot: rgba(255, 190, 130, 0.055);
+  --glow: rgba(240, 163, 94, 0.1);
+  color-scheme: dark;
+}
+
+[data-theme="violet"] {
+  --c-canvas: #0b0a11;
+  --c-surface: #12101b;
+  --c-raised: #191624;
+  --c-line: #2a2440;
+  --c-line-soft: #1f1b2e;
+  --c-ink: #ece9f7;
+  --c-ink-dim: #a49cc0;
+  --c-ink-faint: #756d92;
+  --c-accent: #a78bfa;
+  --c-accent-dim: #4c3a86;
+  --c-gold: #d9a441;
+  --dot: rgba(180, 160, 255, 0.06);
+  --glow: rgba(167, 139, 250, 0.11);
+  color-scheme: dark;
+}
+
+[data-theme="sand"] {
+  --c-canvas: #f7f3ec;
+  --c-surface: #fffdf9;
+  --c-raised: #efe9de;
+  --c-line: #ddd3c3;
+  --c-line-soft: #e9e2d6;
+  --c-ink: #211c16;
+  --c-ink-dim: #5f5749;
+  --c-ink-faint: #8d8474;
+  --c-accent: #9a5b2c;
+  --c-accent-dim: #d8b895;
+  --c-gold: #8a6a1c;
+  --dot: rgba(60, 40, 10, 0.06);
+  --glow: rgba(154, 91, 44, 0.08);
+  color-scheme: light;
+}
+
 /* ─────────────────────────────────────────────────────────────
    Typography styles — data-font on <html>, set before first paint
    by the bootstrap script in index.html and toggled at runtime by
@@ -204,7 +276,30 @@ body {
   transition:
     border-color 0.3s ease,
     background-color 0.3s ease,
+    box-shadow 0.3s ease,
     transform 0.3s ease;
+}
+
+/* Hover lift for cards that are themselves links. The shadow is mixed from
+   the live accent token, so it re-tints with the theme instead of staying
+   one hard-coded colour. */
+.u-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -12px color-mix(in srgb, var(--c-accent) 45%, transparent);
+}
+
+/* Display text that fades from the accent into the ink colour. Applied to the
+   hero name; `background-clip: text` needs a transparent fill to show through. */
+.u-gradient-text {
+  background-image: linear-gradient(
+    115deg,
+    var(--c-accent) 0%,
+    var(--c-ink) 55%,
+    var(--c-ink) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .u-link-underline {

@@ -77,7 +77,7 @@ export const PROFILE = {
     "https://mail.google.com/mail/?view=cm&fs=1&to=vkumar.vivek222@gmail.com",
   github: "https://github.com/vivekkumarq",
   githubHandle: "vivekkumarq",
-  linkedin: "https://www.linkedin.com/in/vivek-k-87036b104/",
+  linkedin: "https://www.linkedin.com/in/vivekkumarq/",
   /**
    * Relative on purpose — no leading slash. The site is served from a
    * subpath (/vivekKumarPortfolio/), so a root-absolute path would
@@ -168,7 +168,7 @@ export const EXPERIENCE: Role[] = [
     current: true,
     location: "Bengaluru, India",
     summary:
-      "Backend microservices for enterprise telecom BSS/OSS platforms — API design, event-driven data flow, and production ownership.",
+      "Backend microservices for enterprise telecom BSS/OSS platforms — API design, event-driven data flow, and production ownership. Joined as a Junior Software Engineer in September 2022 and promoted to Software Engineer in March 2025.",
     quick: [
       "Design and ship backend microservices in **Java, Spring Boot, GraphQL and PostgreSQL** for enterprise telecom platforms, serving carriers like Etisalat.",
       "Own REST APIs across **5+ business modules**, Kafka event-driven pipelines, and Docker/Kubernetes deployments with GitLab and Jenkins CI/CD.",
@@ -307,7 +307,86 @@ export const PROJECTS: Project[] = [
     repo: "https://github.com/vivekkumarq/ParkingLotManagement",
     featured: false,
   },
+  {
+    name: "AlgoCircle",
+    blurb: "A written DSA course that runs entirely in the browser.",
+    detail:
+      "Twenty topics ordered so each one makes the next easier — from what an algorithm actually is, through hashing, recursion and trees, to graphs, segment trees and dynamic programming. Ships a roadmap, curated practice lists and an advanced course track. No account, no progress gamification and no backend: every topic is reachable from the sidebar at any time.",
+    tags: ["Angular", "TypeScript"],
+    repo: "https://github.com/vivekkumarq/algocircle",
+    live: "https://algocircle.duckdns.org",
+    featured: false,
+  },
+  {
+    name: "Linux BashBound",
+    blurb: "From first command to system mastery, with a practice layer.",
+    detail:
+      "A structured Linux and Unix course across sixteen levels — shell, filesystems, permissions, processes, networking, packaging, scripting, administration, storage, security, performance and internals. Adds a command explorer, an interview arena, daily challenges and a troubleshooting lab, plus an in-browser simulated terminal with a fake filesystem so commands can be practised without touching a real machine.",
+    tags: ["React", "TypeScript"],
+    repo: "https://github.com/vivekkumarq/linux-bashbound",
+    live: "https://vivekkumarq.github.io/linux-bashbound/",
+    featured: false,
+  },
+  {
+    name: "InterviewPrepBeforeMinutes",
+    blurb: "Last-minute interview prep across the backend stack.",
+    detail:
+      "1,200+ questions across 37 tech stacks, each with a beginner and an advanced track: Java core and the JVM, the Spring ecosystem, Kafka and GraphQL, microservices and system design, databases, Docker and Kubernetes, testing, frontend and algorithms. Adds per-topic cheatsheets, prepare-by-company filtering, instant global search, inline SVG diagrams for the concepts easier drawn than described, and browser-side progress tracking.",
+    tags: ["JavaScript", "HTML", "CSS"],
+    repo: "https://github.com/vivekkumarq/InterviewPrepBeforeMinutes",
+    live: "https://interviewprepbeforeminutes.duckdns.org",
+    featured: false,
+  },
 ];
+
+/**
+ * Credentials with public verification links. HackerRank ids resolve under
+ * /certificates/; Confluent and Apollo mint their own URLs.
+ */
+export const CERTIFICATIONS = [
+  {
+    title: "Data Streaming Engineer Foundations",
+    org: "Confluent, an IBM Company",
+    year: "Sep 2026",
+    url: "https://certificates.confluent.io/e274a03f-3458-4c3c-ab09-7744e594f5f8",
+  },
+  {
+    title: "Graph Developer – Associate",
+    org: "Apollo GraphQL",
+    year: "Sep 2026",
+    url: "https://www.apollographql.com/tutorials/certifications/05858b09-e9f9-43c7-a130-c9dc03cb55f6",
+  },
+  {
+    title: "Software Engineer",
+    org: "HackerRank",
+    year: "Sep 2026",
+    url: "https://www.hackerrank.com/certificates/08f4b2c70d1c",
+  },
+  {
+    title: "SQL (Advanced)",
+    org: "HackerRank",
+    year: "Sep 2026",
+    url: "https://www.hackerrank.com/certificates/0442bfb5585c",
+  },
+  {
+    title: "Problem Solving (Intermediate)",
+    org: "HackerRank",
+    year: "Sep 2026",
+    url: "https://www.hackerrank.com/certificates/cc223271eabe",
+  },
+  {
+    title: "SQL (Basic)",
+    org: "HackerRank",
+    year: "Mar 2025",
+    url: "https://www.hackerrank.com/certificates/f337560e3865",
+  },
+  {
+    title: "Java (Basic)",
+    org: "HackerRank",
+    year: "Mar 2025",
+    url: "https://www.hackerrank.com/certificates/7fc46ba83de9",
+  },
+] as const;
 
 /* ──────────────── OPEN SOURCE ──────────────── */
 
