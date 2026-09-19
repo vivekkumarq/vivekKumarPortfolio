@@ -5,9 +5,9 @@
 **Software Engineer · Java · Spring Boot · Microservices · Bengaluru**
 
 My personal portfolio. A single-page site built with Angular 22 and Tailwind CSS v4,
-prerendered to static HTML and served from GitHub Pages.
+prerendered to static HTML and served from GitHub Pages on a custom domain.
 
-### [→ vivekkumarq.github.io/vivekKumarPortfolio](https://vivekkumarq.github.io/vivekKumarPortfolio/)
+### [→ vivekkumar.duckdns.org](https://vivekkumar.duckdns.org/)
 
 [![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)](https://angular.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -66,7 +66,7 @@ library. Icons are inline SVG, the scroll reveal is one directive over
 | Rendering | Static prerender | `outputMode: "static"` — no Node server at runtime |
 | Type | Fraunces · Inter · JetBrains Mono | Display / body / mono |
 | CI/CD | GitHub Actions | Builds and deploys on every push to `main` |
-| Hosting | GitHub Pages | Served from `/vivekKumarPortfolio/` |
+| Hosting | GitHub Pages | Custom domain `vivekkumar.duckdns.org`, served from `/` |
 
 ## Features
 
@@ -152,19 +152,24 @@ Repository setup, done once: **Settings → Pages → Build and deployment → S
 
 ### Base href
 
-Because this is a project site rather than a user site, the app is served from a subpath
-and the build needs to know it. The workflow reads a repository variable `BASE_HREF`
-(**Settings → Secrets and variables → Actions → Variables**), defaulting to `/`:
+The build needs to know the path the site is served from. The workflow reads a repository
+variable `BASE_HREF` (**Settings → Secrets and variables → Actions → Variables**),
+defaulting to `/`:
 
 | Hosting | Live URL | `BASE_HREF` |
 | --- | --- | --- |
-| Project site *(current)* | `vivekkumarq.github.io/vivekKumarPortfolio/` | `/vivekKumarPortfolio/` |
+| Custom domain *(current)* | `vivekkumar.duckdns.org` | `/` |
+| Project site | `vivekkumarq.github.io/vivekKumarPortfolio/` | `/vivekKumarPortfolio/` |
 | User site | `vivekkumarq.github.io` | `/` |
-| Custom domain | `yourdomain.com` | `/` |
 
-> **This is why paths in the code have no leading slash.** `resumePath` is
-> `resume/…`, not `/resume/…`. A root-absolute path would resolve against the domain root
-> and 404 under a subpath. If you add any new asset link, keep it relative.
+The custom domain is set by `public/CNAME`, which Angular copies to the site root; GitHub
+Pages reads that file on each deploy. Never point a `www.` name at it — DuckDNS resolves
+every wildcard, but GitHub holds no certificate for `www.<name>.duckdns.org`, so HTTPS
+fails outright there.
+
+> **Paths in the code have no leading slash.** `resumePath` is `resume/…`, not
+> `/resume/…`, so one spelling works at the domain root and under a subpath alike. If you
+> add any new asset link, keep it relative.
 
 ---
 

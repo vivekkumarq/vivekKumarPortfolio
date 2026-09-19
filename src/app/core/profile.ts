@@ -79,10 +79,10 @@ export const PROFILE = {
   githubHandle: "vivekkumarq",
   linkedin: "https://www.linkedin.com/in/vivekkumarq/",
   /**
-   * Relative on purpose — no leading slash. The site is served from a
-   * subpath (/vivekKumarPortfolio/), so a root-absolute path would
-   * resolve against the domain root and 404. This resolves against the
-   * <base href> the build injects.
+   * Relative on purpose — no leading slash, so it resolves against whatever
+   * <base href> the build injects. That keeps one spelling working at the
+   * custom domain root and at the old project-site subpath, which still
+   * serves until the redirect is retired.
    */
   resumePath: "resume/Vivek_Kumar_Resume.pdf",
   /**
@@ -90,7 +90,7 @@ export const PROFILE = {
    * JSON-LD. No trailing slash. Update this when moving to a custom
    * domain, or search engines keep crediting the old address.
    */
-  siteUrl: "https://vivekkumarq.github.io/vivekKumarPortfolio",
+  siteUrl: "https://vivekkumar.duckdns.org",
   availability: "Open to backend & platform engineering roles",
 } as const;
 

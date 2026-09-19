@@ -34,9 +34,9 @@ jobs:
       # BASE_HREF must match the path the site is served from, or every
       # asset 404s. Set as a repository variable under
       # Settings -> Secrets and variables -> Actions -> Variables.
-      #   project site (current)  ->  /vivekKumarPortfolio/
+      #   custom domain (current) ->  /   (set by public/CNAME)
+      #   project site            ->  /vivekKumarPortfolio/
       #   user site               ->  /
-      #   custom domain (CNAME)   ->  /
       - name: Build
         run: npm run build -- --base-href "${{ vars.BASE_HREF || '/' }}"
 
