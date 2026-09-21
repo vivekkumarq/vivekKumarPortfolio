@@ -434,8 +434,19 @@ export const OPEN_SOURCE: OpenSourceProject[] = [
       "Generates API clients, server stubs and documentation from an OpenAPI specification.",
     repoUrl: "https://github.com/OpenAPITools/openapi-generator",
     stars: "26.7k",
-    tags: ["Kotlin", "Rust", "Mustache", "Code Generation"],
+    tags: ["Kotlin", "Rust", "C#", "Mustache", "Code Generation"],
     contributions: [
+      {
+        kind: "pr",
+        number: 24820,
+        title: "Throw JsonException from generated C# converters on invalid JSON",
+        url: "https://github.com/OpenAPITools/openapi-generator/pull/24820",
+        status: "merged",
+        detail:
+          "Generated C# clients raised an argument-validation error when they met malformed JSON, so the JSON path System.Text.Json attaches to a parse failure was lost and the error slipped past callers catching JsonException. Both throw sites now raise JsonException, and the sample projects were regenerated to match.",
+        diff: "+5,892 across 1,689 files — nearly all regenerated samples",
+        meta: "Closes #24345",
+      },
       {
         kind: "pr",
         number: 24819,
