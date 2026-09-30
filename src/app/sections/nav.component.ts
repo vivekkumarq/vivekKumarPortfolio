@@ -10,6 +10,7 @@ import { NAV_LINKS, PROFILE } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
 import { FontMenuComponent } from '../shared/font-menu.component';
 import { ThemeMenuComponent } from '../shared/theme-menu.component';
+import { PaletteService } from '../shared/command-palette.component';
 
 /**
  * Sticky header: monogram, anchor nav with scroll-spy, typography and theme
@@ -62,10 +63,24 @@ import { ThemeMenuComponent } from '../shared/theme-menu.component';
         </ul>
 
         <div class="flex items-center gap-2">
+          <!-- Command menu trigger. Desktop only: the shortcut is the point,
+               and phones have the menu sheet. -->
+          <button
+            type="button"
+            (click)="palette.open()"
+            class="hidden min-h-9 items-center gap-2 rounded-full border border-line pr-2 pl-3 text-ink-dim transition-colors hover:border-accent hover:text-accent lg:inline-flex"
+            aria-label="Open command menu"
+            aria-keyshortcuts="Control+K Meta+K"
+          >
+            <app-icon name="search" cls="h-3.5 w-3.5" />
+            <kbd class="u-kbd">{{ shortcut() }}</kbd>
+          </button>
+
+          <!-- Hidden between md and lg, where the inline links need the room. -->
           <a
             [href]="resumePath"
             download
-            class="hidden min-h-11 items-center gap-2 rounded-full border border-line px-4 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-dim uppercase transition-colors hover:border-accent hover:text-accent sm:inline-flex md:min-h-9"
+            class="hidden min-h-11 items-center gap-2 rounded-full border border-line px-4 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-dim uppercase transition-colors hover:border-accent hover:text-accent sm:inline-flex md:hidden md:min-h-9 lg:inline-flex"
           >
             <app-icon name="download" cls="h-3.5 w-3.5" />
             Résumé
@@ -141,6 +156,9 @@ import { ThemeMenuComponent } from '../shared/theme-menu.component';
 })
 export class NavComponent {
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly palette = inject(PaletteService);
+  /** ⌘K on Apple platforms, Ctrl K elsewhere — decided in the browser. */
+  protected readonly shortcut = signal('⌘K');
 
   protected readonly links = NAV_LINKS;
   protected readonly initials = PROFILE.initials;
@@ -154,6 +172,7 @@ export class NavComponent {
 
   constructor() {
     afterNextRender(() => {
+      if (!/Mac|iPhone|iPad/.test(navigator.platform)) this.shortcut.set('Ctrl K');
       this.watchScroll();
       this.watchSections();
     });

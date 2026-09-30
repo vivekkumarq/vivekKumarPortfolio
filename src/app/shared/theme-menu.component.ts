@@ -60,7 +60,7 @@ import { IconComponent } from './icon.component';
               type="button"
               role="menuitemradio"
               [attr.aria-checked]="theme.theme() === option.id"
-              (click)="pick(option.id)"
+              (click)="pick(option.id, $event)"
               class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised"
             >
               <span
@@ -105,9 +105,17 @@ export class ThemeMenuComponent {
   protected readonly options = THEME_OPTIONS;
   protected readonly open = signal(false);
 
-  protected pick(id: Theme): void {
-    this.theme.set(id);
+  /** The reveal grows from the menu's trigger button, where the eye is. */
+  protected pick(id: Theme, event: MouseEvent): void {
+    const trigger = this.host.nativeElement.querySelector('button');
+    const box = trigger?.getBoundingClientRect();
     this.open.set(false);
+    this.theme.set(
+      id,
+      box
+        ? { x: box.left + box.width / 2, y: box.top + box.height / 2 }
+        : { x: event.clientX, y: event.clientY },
+    );
   }
 
   protected onDocumentClick(event: Event): void {

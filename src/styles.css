@@ -187,6 +187,9 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5.5rem;
+  /* Reserve the scrollbar's width, so locking scroll under the command
+     menu does not shift the page sideways. */
+  scrollbar-gutter: stable;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -229,6 +232,11 @@ body {
   outline-offset: 3px;
   border-radius: 4px;
 }
+/* Text fields that already show focus through their caret and container
+   (command menu, terminal) — a ring around them only adds noise. */
+.u-bare:focus-visible {
+  outline: none;
+}
 
 /* ─────────────────────────────────────────────────────────────
    Utilities shared across components
@@ -270,6 +278,7 @@ body {
 }
 
 .u-card {
+  position: relative;
   background: var(--c-surface);
   border: 1px solid var(--c-line);
   border-radius: 0.875rem;
@@ -278,6 +287,119 @@ body {
     background-color 0.3s ease,
     box-shadow 0.3s ease,
     transform 0.3s ease;
+}
+
+/* Pointer spotlight on cards. app.ts writes --cx/--cy (card-relative) as the
+   pointer moves; ::before is a 1px ring masked to the border so the edge
+   nearest the cursor lights up, ::after a faint wash inside. Neither takes
+   pointer events, and both stay invisible until hover. */
+.u-card::before,
+.u-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.u-card::before {
+  padding: 1px;
+  background: radial-gradient(
+    300px circle at var(--cx, -100%) var(--cy, -100%),
+    var(--c-accent),
+    transparent 65%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.u-card::after {
+  background: radial-gradient(
+    380px circle at var(--cx, -100%) var(--cy, -100%),
+    color-mix(in srgb, var(--c-accent) 8%, transparent),
+    transparent 60%
+  );
+}
+.u-card:hover::before,
+.u-card:hover::after {
+  opacity: 1;
+}
+
+/* Page-wide ambient light behind the content, following the pointer. */
+.u-spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    640px circle at var(--mx, -100vw) var(--my, -100vh),
+    color-mix(in srgb, var(--c-accent) 7%, transparent),
+    transparent 75%
+  );
+}
+
+/* Keyboard key cap, used by the command menu and its hints. */
+.u-kbd {
+  display: inline-block;
+  min-width: 1.35rem;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--c-line);
+  border-bottom-width: 2px;
+  border-radius: 0.3rem;
+  background: var(--c-raised);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  line-height: 1.1rem;
+  text-align: center;
+  color: var(--c-ink-faint);
+}
+
+/* Command menu — a native modal <dialog>, pinned near the top like a
+   launcher rather than dead centre. */
+.u-palette {
+  width: min(40rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: none;
+  margin: 12vh auto auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+.u-palette::backdrop {
+  background: color-mix(in srgb, var(--c-canvas) 55%, transparent);
+  backdrop-filter: blur(6px);
+}
+.u-palette[open] {
+  animation: u-pop 0.18s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes u-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.985);
+  }
+}
+/* The modal does not stop the page behind it scrolling on its own. */
+html:has(.u-palette[open]) {
+  overflow: hidden;
+}
+
+/* Theme switch — the new palette grows as a circle from the control that
+   was used (see ThemeService). Only the clip-path animates; the default
+   cross-fade is switched off, and .vt freezes colour transitions so the
+   snapshot is taken of final colours rather than mid-fade ones. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+.vt,
+.vt * {
+  transition: none !important;
 }
 
 /* Hover lift for cards that are themselves links. The shadow is mixed from

@@ -23,7 +23,10 @@ export type IconName =
   | 'server'
   | 'database'
   | 'terminal'
-  | 'grid';
+  | 'grid'
+  | 'search'
+  | 'hash'
+  | 'type';
 
 /**
  * Inline SVG icon set. Stroke icons inherit `currentColor`, so colour comes
@@ -178,6 +181,22 @@ export type IconName =
           <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
           <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
           <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+        </svg>
+      }
+      @case ('search') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <circle cx="11" cy="11" r="6.5" />
+          <path d="m20 20-4.2-4.2" />
+        </svg>
+      }
+      @case ('hash') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <path d="M5 9h14M4 15h14M10 3 8 21M16 3l-2 18" />
+        </svg>
+      }
+      @case ('type') {
+        <svg viewBox="0 0 24 24" [class]="cls()" [attr.style]="strokeStyle">
+          <path d="M5 7V5h14v2M12 5v14M9 19h6" />
         </svg>
       }
     }

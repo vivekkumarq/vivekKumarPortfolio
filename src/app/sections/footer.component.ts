@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { PROFILE } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
+import { PaletteService } from '../shared/command-palette.component';
 
 @Component({
   selector: 'app-footer',
@@ -16,6 +17,13 @@ import { IconComponent } from '../shared/icon.component';
           <p class="mt-1 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-faint">
             Built with Angular &amp; Tailwind · © {{ year }}
           </p>
+          <button
+            type="button"
+            (click)="palette.open()"
+            class="mt-2 hidden items-center gap-2 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-faint transition-colors hover:text-accent lg:inline-flex"
+          >
+            Press <kbd class="u-kbd">/</kbd> to jump anywhere
+          </button>
         </div>
 
         <div class="flex items-center gap-2">
@@ -59,6 +67,7 @@ import { IconComponent } from '../shared/icon.component';
 })
 export class FooterComponent {
   protected readonly profile = PROFILE;
+  protected readonly palette = inject(PaletteService);
   /** Evaluated at build time during prerender; fine for a copyright line. */
   protected readonly year = new Date().getFullYear();
 }

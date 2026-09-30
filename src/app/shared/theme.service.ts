@@ -60,11 +60,55 @@ export class ThemeService {
     return LIGHT_THEMES.has(this._theme());
   }
 
-  set(theme: Theme): void {
+  /**
+   * Switches theme. Where the View Transitions API exists, the new palette
+   * is revealed as a circle growing from `origin` (the control that was
+   * clicked) instead of a hard cut; elsewhere, and under reduced motion,
+   * it simply swaps.
+   */
+  set(theme: Theme, origin?: { x: number; y: number }): void {
     this._theme.set(theme);
     if (!this.isBrowser) return;
 
-    document.documentElement.setAttribute('data-theme', theme);
+    const root = document.documentElement;
+    const apply = () => root.setAttribute('data-theme', theme);
+
+    if (
+      typeof document.startViewTransition !== 'function' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      apply();
+    } else {
+      const x = origin?.x ?? window.innerWidth / 2;
+      const y = origin?.y ?? window.innerHeight / 2;
+      const radius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y),
+      );
+      // Colour transitions would fade inside the snapshot while the circle
+      // grows, muddying the reveal — .vt suspends them for its duration.
+      root.classList.add('vt');
+      const transition = document.startViewTransition(apply);
+      transition.ready
+        .then(() =>
+          root.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${radius}px at ${x}px ${y}px)`,
+              ],
+            },
+            {
+              duration: 560,
+              easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+              pseudoElement: '::view-transition-new(root)',
+            },
+          ),
+        )
+        .catch(() => {});
+      transition.finished.finally(() => root.classList.remove('vt'));
+    }
+
     try {
       localStorage.setItem(STORAGE_KEY, theme);
     } catch {

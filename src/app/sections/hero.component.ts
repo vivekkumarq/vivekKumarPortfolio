@@ -1,8 +1,20 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  afterNextRender,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { PROFILE, experienceLabel } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
 import { TechIconComponent } from '../shared/tech-icon.component';
 import { RevealDirective } from '../shared/reveal.directive';
+import { TerminalComponent } from '../shared/terminal.component';
+import { PaletteService } from '../shared/command-palette.component';
 
 /**
  * Opening screen. Editorial left column (name, pitch, actions) paired with a
@@ -12,7 +24,7 @@ import { RevealDirective } from '../shared/reveal.directive';
 @Component({
   selector: 'app-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, TechIconComponent, RevealDirective],
+  imports: [IconComponent, TechIconComponent, RevealDirective, TerminalComponent],
   template: `
     <section id="top" class="relative overflow-hidden">
       <!-- Backdrop: dot grid, soft glow, faint outline motifs -->
@@ -136,9 +148,13 @@ import { RevealDirective } from '../shared/reveal.directive';
             </a>
           </div>
 
-          <p appReveal [i]="6" class="mt-7 flex items-center gap-2 font-mono text-xs text-ink-faint">
+          <p appReveal [i]="6" class="mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-ink-faint">
             <app-icon name="pin" cls="h-3.5 w-3.5" />
             {{ profile.location }}
+            @if (localTime(); as time) {
+              <span class="h-1 w-1 rounded-full bg-line" aria-hidden="true"></span>
+              <span>{{ time }} IST</span>
+            }
           </p>
         </div>
 
@@ -146,36 +162,85 @@ import { RevealDirective } from '../shared/reveal.directive';
              it is the most distinctive thing on the screen and worth keeping. -->
         <div appReveal [i]="4">
           <div class="u-card overflow-hidden">
-            <div class="flex items-center gap-2 border-b border-line px-4 py-3">
+            <div class="flex items-center gap-2 border-b border-line px-4">
               <span class="h-2.5 w-2.5 rounded-full border border-line"></span>
               <span class="h-2.5 w-2.5 rounded-full border border-line"></span>
               <span class="h-2.5 w-2.5 rounded-full border border-line"></span>
-              <span class="ml-2 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-faint">
-                engineer.yaml
-              </span>
+
+              <div role="tablist" aria-label="Hero window" class="ml-2 flex">
+                @for (t of tabs; track t.id) {
+                  <button
+                    type="button"
+                    role="tab"
+                    [id]="'hero-tab-' + t.id"
+                    [attr.aria-selected]="tab() === t.id"
+                    [attr.aria-controls]="'hero-panel-' + t.id"
+                    (click)="select(t.id)"
+                    class="relative inline-flex min-h-11 items-center gap-1.5 px-3 font-mono text-[0.6875rem] tracking-[0.1em] transition-colors"
+                    [class.text-ink]="tab() === t.id"
+                    [class.text-ink-faint]="tab() !== t.id"
+                    [class.hover:text-ink-dim]="tab() !== t.id"
+                  >
+                    {{ t.label }}
+                    @if (t.id === 'terminal' && !termOpened()) {
+                      <span class="relative flex h-1.5 w-1.5" aria-hidden="true">
+                        <span class="u-pulse-ring absolute inline-flex h-full w-full rounded-full bg-accent"></span>
+                        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent"></span>
+                      </span>
+                    }
+                    <span
+                      class="absolute inset-x-3 -bottom-px h-px bg-accent transition-opacity"
+                      [class.opacity-0]="tab() !== t.id"
+                    ></span>
+                  </button>
+                }
+              </div>
             </div>
 
-            <dl class="space-y-0 p-4 font-mono text-[0.7rem] leading-7 sm:p-5 sm:text-[0.78rem]">
-              @for (row of manifest; track row.key) {
+            <!-- The yaml panel always sets the window's height; the terminal
+                 overlays it, so switching tabs never shifts the layout. -->
+            <div class="relative">
+              <dl
+                id="hero-panel-yaml"
+                role="tabpanel"
+                aria-labelledby="hero-tab-yaml"
+                class="space-y-0 p-4 font-mono text-[0.7rem] leading-7 sm:p-5 sm:text-[0.78rem]"
+                [class.invisible]="tab() !== 'yaml'"
+                [attr.inert]="tab() !== 'yaml' ? '' : null"
+              >
+                @for (row of manifest; track row.key) {
+                  <div class="flex gap-3">
+                    <dt class="shrink-0 text-ink-faint">{{ row.key }}:</dt>
+                    <dd class="text-ink-dim">{{ row.value }}</dd>
+                  </div>
+                }
                 <div class="flex gap-3">
-                  <dt class="shrink-0 text-ink-faint">{{ row.key }}:</dt>
-                  <dd class="text-ink-dim">{{ row.value }}</dd>
+                  <dt class="shrink-0 text-ink-faint">stack:</dt>
+                  <dd class="sr-only">{{ stackLabel }}</dd>
+                </div>
+                <ul class="ml-4 list-none space-y-0" aria-hidden="true">
+                  @for (item of stack; track item) {
+                    <li class="flex items-center gap-2 text-accent">
+                      <span class="text-ink-faint">-</span>
+                      <app-tech-icon [name]="item" cls="h-3.5 w-3.5 opacity-90" />
+                      <span>{{ item }}</span>
+                    </li>
+                  }
+                </ul>
+              </dl>
+
+              @if (termOpened()) {
+                <div
+                  id="hero-panel-terminal"
+                  role="tabpanel"
+                  aria-labelledby="hero-tab-terminal"
+                  class="absolute inset-0"
+                  [class.hidden]="tab() !== 'terminal'"
+                >
+                  <app-terminal (exit)="select('yaml')" />
                 </div>
               }
-              <div class="flex gap-3">
-                <dt class="shrink-0 text-ink-faint">stack:</dt>
-                <dd class="sr-only">{{ stackLabel }}</dd>
-              </div>
-              <ul class="ml-4 list-none space-y-0" aria-hidden="true">
-                @for (item of stack; track item) {
-                  <li class="flex items-center gap-2 text-accent">
-                    <span class="text-ink-faint">-</span>
-                    <app-tech-icon [name]="item" cls="h-3.5 w-3.5 opacity-90" />
-                    <span>{{ item }}</span>
-                  </li>
-                }
-              </ul>
-            </dl>
+            </div>
           </div>
         </div>
       </div>
@@ -192,6 +257,54 @@ import { RevealDirective } from '../shared/reveal.directive';
 })
 export class HeroComponent {
   protected readonly profile = PROFILE;
+
+  protected readonly tabs = [
+    { id: 'yaml', label: 'engineer.yaml' },
+    { id: 'terminal', label: 'terminal' },
+  ] as const;
+  protected readonly tab = signal<'yaml' | 'terminal'>('yaml');
+  /** The terminal mounts on first visit and then stays, keeping its history. */
+  protected readonly termOpened = signal(false);
+  private readonly terminal = viewChild(TerminalComponent);
+
+  /** Wall-clock time in Bengaluru, filled in after hydration. */
+  protected readonly localTime = signal('');
+
+  constructor() {
+    const palette = inject(PaletteService);
+    let seen = palette.terminalRequests();
+    effect(() => {
+      const requests = palette.terminalRequests();
+      if (requests === seen) return;
+      seen = requests;
+      untracked(() => {
+        document.getElementById('top')?.scrollIntoView();
+        this.select('terminal');
+      });
+    });
+
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      const format = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+      const tick = () => this.localTime.set(format.format(new Date()));
+      tick();
+      const timer = setInterval(tick, 15_000);
+      destroyRef.onDestroy(() => clearInterval(timer));
+    });
+  }
+
+  protected select(id: 'yaml' | 'terminal'): void {
+    this.tab.set(id);
+    if (id === 'terminal') {
+      this.termOpened.set(true);
+      // Focus once the panel exists and is visible.
+      setTimeout(() => this.terminal()?.focus());
+    }
+  }
 
   protected readonly manifest = [
     { key: 'name', value: PROFILE.name },
