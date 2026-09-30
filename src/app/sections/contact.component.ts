@@ -52,7 +52,7 @@ type Channel = {
               [href]="profile.emailUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-canvas transition-opacity hover:opacity-90"
+              class="u-shine u-press inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-canvas"
             >
               <app-icon name="mail" cls="h-4 w-4" />
               Send an email

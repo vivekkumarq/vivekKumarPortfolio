@@ -24,12 +24,15 @@ import { RevealDirective } from './reveal.directive';
           <span class="font-mono text-[0.6875rem] tracking-[0.18em] text-ink-faint">
             {{ index() }}
           </span>
-          <span class="h-px w-6 bg-line"></span>
+          <span class="u-draw-rule h-px w-6 bg-line"></span>
           <span class="u-eyebrow">{{ eyebrow() }}</span>
         </div>
 
-        <h2 appReveal [i]="1" class="u-display text-[2rem] text-ink sm:text-4xl md:text-5xl">
-          {{ heading() }}
+        <!-- The inner span does the masked rise. The clip cannot sit on the
+             h2 itself: IntersectionObserver measures the clipped box, and a
+             heading clipped to nothing never counts as in view. -->
+        <h2 appReveal [i]="1" class="u-rise u-display text-[2rem] text-ink sm:text-4xl md:text-5xl">
+          <span>{{ heading() }}</span>
         </h2>
 
         @if (lead()) {

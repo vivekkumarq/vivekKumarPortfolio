@@ -458,6 +458,160 @@ html:has(.u-palette[open]) {
   transform: none;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Motion system. Two curves: --ease-out for small state changes,
+   --ease-expo (fast start, long settle) for anything that travels.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Load-time entrance for what is on screen at first paint (header, hero).
+   Pure CSS, so it plays from the prerendered HTML without waiting for
+   JavaScript. Each element sets its own start with --d. Keyframes give only
+   the starting state; the end is the element's normal style. */
+@keyframes u-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+}
+@keyframes u-enter-card {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+    filter: blur(10px);
+  }
+}
+@keyframes u-enter-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+/* A line of display type rising out from behind its own baseline. The
+   negative end insets leave room for ascenders, descenders and italics. */
+@keyframes u-mask {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(0.45em);
+  }
+  to {
+    clip-path: inset(-0.2em -0.1em -0.3em -0.1em);
+    transform: none;
+  }
+}
+@keyframes u-draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.u-enter {
+  animation: u-enter 0.8s var(--ease-expo) var(--d, 0ms) both;
+}
+.u-enter-card {
+  animation-name: u-enter-card;
+  animation-duration: 1.1s;
+}
+.u-enter-down {
+  animation: u-enter-down 0.7s var(--ease-expo) both;
+}
+.u-mask {
+  animation: u-mask 1.1s var(--ease-expo) var(--d, 0ms) both;
+}
+.u-draw {
+  transform-origin: left;
+  animation: u-draw 0.9s var(--ease-expo) var(--d, 0ms) both;
+}
+
+/* Section headings: the same rise, triggered on scroll by appReveal. The
+   h2 only fades; its inner span travels and is clipped (see SectionComponent
+   for why the clip cannot live on the observed element). */
+.u-rise.u-reveal {
+  transform: none;
+}
+.u-rise.u-reveal > span {
+  display: block;
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(0.5em);
+  transition:
+    transform 1s var(--ease-expo),
+    clip-path 1s var(--ease-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.u-rise.u-reveal.is-in > span {
+  clip-path: inset(-0.2em -0.1em -0.35em -0.1em);
+  transform: none;
+}
+
+/* The short rule in each section eyebrow draws itself in after the row appears. */
+.u-reveal .u-draw-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s var(--ease-expo) calc(var(--reveal-delay, 0ms) + 150ms);
+}
+.u-reveal.is-in .u-draw-rule {
+  transform: none;
+}
+
+/* Header highlight gliding between links. */
+.u-nav-pill {
+  transition:
+    transform 0.45s var(--ease-expo),
+    width 0.45s var(--ease-expo),
+    opacity 0.25s ease;
+}
+
+/* Primary buttons: a light sweep on hover, a glow in the accent, and a
+   slight give when pressed. */
+.u-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.u-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 65%
+  );
+  transform: translateX(-110%);
+  transition: transform 0.75s var(--ease-expo);
+  pointer-events: none;
+}
+.u-shine:hover::after {
+  transform: translateX(110%);
+}
+.u-press {
+  transition:
+    transform 0.2s var(--ease-out),
+    box-shadow 0.3s ease;
+}
+.u-press:hover {
+  box-shadow: 0 10px 26px -12px color-mix(in srgb, var(--c-accent) 75%, transparent);
+}
+.u-press:active {
+  transform: scale(0.97);
+}
+
+/* Scroll cue under the hero. */
+@keyframes u-bob {
+  50% {
+    transform: translateY(5px);
+  }
+}
+.u-bob {
+  animation: u-bob 2.2s ease-in-out infinite;
+}
+
 /* Animated collapse — the 0fr→1fr grid-row trick, used by the experience
    timeline's Quick view / Deep dive switch. Content height is unknown, so
    max-height hacks would either clip or ease unevenly; grid tracks don't. */
@@ -515,10 +669,21 @@ html:has(.u-palette[open]) {
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    /* Delays too, or a staggered element would sit invisible in its
+       starting state until its turn came. */
+    animation-delay: 0ms !important;
     transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
   }
   .u-reveal {
     opacity: 1;
+    transform: none;
+  }
+  .u-rise.u-reveal > span {
+    clip-path: none;
+    transform: none;
+  }
+  .u-reveal .u-draw-rule {
     transform: none;
   }
 }

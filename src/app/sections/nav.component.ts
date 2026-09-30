@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   afterNextRender,
+  viewChild,
   inject,
   signal,
 } from '@angular/core';
@@ -26,7 +28,7 @@ import { PaletteService } from '../shared/command-palette.component';
   imports: [IconComponent, FontMenuComponent, ThemeMenuComponent],
   template: `
     <header
-      class="fixed inset-x-0 top-0 z-50 transition-colors duration-300"
+      class="u-enter-down fixed inset-x-0 top-0 z-50 transition-colors duration-300"
       [class.border-b]="scrolled()"
       [class.border-line]="scrolled()"
       [style.background-color]="scrolled() ? 'color-mix(in srgb, var(--c-canvas) 82%, transparent)' : 'transparent'"
@@ -45,12 +47,23 @@ import { PaletteService } from '../shared/command-palette.component';
         </a>
 
         <!-- Desktop links -->
-        <ul class="hidden items-center gap-1 md:flex">
+        <ul #linkList class="relative hidden items-center gap-1 md:flex" (mouseleave)="hover(null)">
+          <!-- Sliding highlight. Sits under the links (they are z-[1]). -->
+          <span
+            aria-hidden="true"
+            class="u-nav-pill pointer-events-none absolute top-1/2 left-0 h-8 -translate-y-1/2 rounded-full border border-line-soft bg-raised"
+            [style.width.px]="pill().width"
+            [style.transform]="'translateX(' + pill().x + 'px)'"
+            [style.opacity]="pill().width ? 1 : 0"
+          ></span>
           @for (link of links; track link.href) {
-            <li>
+            <li class="relative z-[1]">
               <a
                 [href]="link.href"
-                class="rounded-md px-3 py-2 text-[0.8125rem] transition-colors"
+                (mouseenter)="hover(link.href)"
+                (focus)="hover(link.href)"
+                (blur)="hover(null)"
+                class="rounded-full px-3 py-2 text-[0.8125rem] transition-colors"
                 [class.text-accent]="active() === link.href"
                 [class.text-ink-dim]="active() !== link.href"
                 [class.hover:text-ink]="active() !== link.href"
@@ -170,12 +183,45 @@ export class NavComponent {
   /** 0–1 share of the scrollable page already read. */
   protected readonly progress = signal(0);
 
+  private readonly linkList = viewChild<ElementRef<HTMLElement>>('linkList');
+  private hovered: string | null = null;
+  /** Position of the sliding highlight, relative to the link list. */
+  protected readonly pill = signal({ x: 0, width: 0 });
+
   constructor() {
     afterNextRender(() => {
       if (!/Mac|iPhone|iPad/.test(navigator.platform)) this.shortcut.set('Ctrl K');
       this.watchScroll();
       this.watchSections();
+      this.watchLinkSizes();
     });
+  }
+
+  protected hover(href: string | null): void {
+    this.hovered = href;
+    this.movePill();
+  }
+
+  /** Glides the highlight to the hovered link, else the active one, else hides it. */
+  private movePill(): void {
+    const list = this.linkList()?.nativeElement;
+    const target = this.hovered ?? this.active();
+    const link = target ? list?.querySelector<HTMLElement>(`a[href="${target}"]`) : null;
+    if (!list || !link) {
+      this.pill.update((p) => ({ ...p, width: 0 }));
+      return;
+    }
+    const box = link.getBoundingClientRect();
+    this.pill.set({ x: box.left - list.getBoundingClientRect().left, width: box.width });
+  }
+
+  /** Link widths change with the typography style and the viewport; follow them. */
+  private watchLinkSizes(): void {
+    const list = this.linkList()?.nativeElement;
+    if (!list || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => this.movePill());
+    observer.observe(list);
+    this.destroyRef.onDestroy(() => observer.disconnect());
   }
 
   /** Header grows a border and a blur once the page leaves the top, and the
@@ -211,6 +257,7 @@ export class NavComponent {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             this.active.set(`#${entry.target.id}`);
+            this.movePill();
           }
         }
       },

@@ -18,13 +18,11 @@ import { FONT_OPTIONS, TypographyService } from './typography.service';
 
 /**
  * Shared open state, so the header button, the footer hint and the global
- * shortcut all drive one palette. `terminalRequests` is a counter the hero
- * watches: every increment means "switch to the terminal tab and focus it".
+ * shortcut all drive one palette.
  */
 @Injectable({ providedIn: 'root' })
 export class PaletteService {
   readonly isOpen = signal(false);
-  readonly terminalRequests = signal(0);
 
   open(): void {
     this.isOpen.set(true);
@@ -207,16 +205,6 @@ export class CommandPaletteComponent {
       keywords: 'resume cv',
       icon: 'download',
       run: () => this.download(),
-    },
-    {
-      id: 'terminal',
-      group: 'Actions',
-      label: 'Open the terminal',
-      keywords: 'shell console cli bash command line',
-      icon: 'terminal',
-      run: () => {
-        this.palette.terminalRequests.update((n) => n + 1);
-      },
     },
     {
       id: 'github',

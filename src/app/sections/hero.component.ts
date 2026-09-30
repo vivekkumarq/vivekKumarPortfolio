@@ -3,28 +3,27 @@ import {
   Component,
   DestroyRef,
   afterNextRender,
-  effect,
   inject,
   signal,
-  untracked,
-  viewChild,
 } from '@angular/core';
 import { PROFILE, experienceLabel } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
 import { TechIconComponent } from '../shared/tech-icon.component';
-import { RevealDirective } from '../shared/reveal.directive';
-import { TerminalComponent } from '../shared/terminal.component';
-import { PaletteService } from '../shared/command-palette.component';
 
 /**
  * Opening screen. Editorial left column (name, pitch, actions) paired with a
  * service-manifest card on large viewports — a nod to the kind of systems the
  * rest of the page is about.
+ *
+ * The entrance is pure CSS (u-enter / u-mask / u-draw in styles.css), timed
+ * through --d on each element, rather than the scroll-reveal directive the
+ * sections use: the hero is on screen at load, so it animates from first
+ * paint instead of sitting invisible until JavaScript hydrates.
  */
 @Component({
   selector: 'app-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, TechIconComponent, RevealDirective, TerminalComponent],
+  imports: [IconComponent, TechIconComponent],
   template: `
     <section id="top" class="relative overflow-hidden">
       <!-- Backdrop: dot grid, soft glow, faint outline motifs -->
@@ -62,7 +61,7 @@ import { PaletteService } from '../shared/command-palette.component';
       >
         <!-- Left column -->
         <div>
-          <div appReveal class="mb-9 inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/60 px-3.5 py-1.5">
+          <div class="u-enter mb-9 inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/60 px-3.5 py-1.5">
             <span class="relative flex h-2 w-2">
               <span class="u-pulse-ring absolute inline-flex h-full w-full rounded-full bg-accent"></span>
               <span class="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
@@ -81,38 +80,43 @@ import { PaletteService } from '../shared/command-palette.component';
             </span>
           </div>
 
-          <p appReveal [i]="1" class="u-eyebrow mb-6">{{ profile.role }}</p>
+          <p class="u-enter u-eyebrow mb-6" style="--d: 80ms">{{ profile.role }}</p>
 
           <h1
-            appReveal
-            [i]="2"
-            class="u-display u-gradient-text text-[clamp(3rem,10vw,5.5rem)] text-ink"
+            class="u-mask u-display u-gradient-text text-[clamp(3rem,10vw,5.5rem)] text-ink"
+            style="--d: 160ms"
           >
             {{ profile.name }}
           </h1>
 
-          <div appReveal [i]="3" class="mt-7 flex items-center gap-3 sm:gap-4">
-            <span class="h-px w-8 shrink-0 bg-accent sm:w-10"></span>
+          <div class="mt-7 flex items-center gap-3 sm:gap-4">
+            <span class="u-draw h-px w-8 shrink-0 bg-accent sm:w-10" style="--d: 420ms"></span>
             <!-- text-xs keeps the stack on one line at 375px; wrapping left
                  the rule stranded beside a two-line paragraph. -->
-            <p class="font-mono text-xs tracking-[0.04em] text-ink-dim sm:text-sm">
+            <p
+              class="u-enter font-mono text-xs tracking-[0.04em] text-ink-dim sm:text-sm"
+              style="--d: 480ms"
+            >
               {{ profile.subtitle }}
             </p>
           </div>
 
-          <p appReveal [i]="4" class="mt-9 max-w-xl text-[1.0625rem] leading-relaxed text-ink-dim">
+          <p
+            class="u-enter mt-9 max-w-xl text-[1.0625rem] leading-relaxed text-ink-dim"
+            style="--d: 560ms"
+          >
             I build backend microservices that hold up in production — Java and Spring Boot
             services, Kafka event pipelines, and GraphQL and REST APIs running on Kubernetes
             inside enterprise telecom platforms.
           </p>
 
           <!-- Actions -->
-          <div appReveal [i]="5" class="mt-10 flex flex-wrap items-center gap-3">
+          <div class="u-enter mt-10 flex flex-wrap items-center gap-3" style="--d: 640ms">
             <a
               [href]="profile.emailUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-canvas transition-opacity hover:opacity-90"
+              class="u-shine u-press inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-canvas"
             >
               <app-icon name="mail" cls="h-4 w-4" />
               Get in touch
@@ -148,7 +152,10 @@ import { PaletteService } from '../shared/command-palette.component';
             </a>
           </div>
 
-          <p appReveal [i]="6" class="mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-ink-faint">
+          <p
+            class="u-enter mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-ink-faint"
+            style="--d: 720ms"
+          >
             <app-icon name="pin" cls="h-3.5 w-3.5" />
             {{ profile.location }}
             @if (localTime(); as time) {
@@ -160,97 +167,52 @@ import { PaletteService } from '../shared/command-palette.component';
 
         <!-- Right column on desktop; stacks under the intro on phones, where
              it is the most distinctive thing on the screen and worth keeping. -->
-        <div appReveal [i]="4">
+        <div class="u-enter u-enter-card" style="--d: 300ms">
           <div class="u-card overflow-hidden">
-            <div class="flex items-center gap-2 border-b border-line px-4">
+            <div class="flex items-center gap-2 border-b border-line px-4 py-3">
               <span class="h-2.5 w-2.5 rounded-full border border-line"></span>
               <span class="h-2.5 w-2.5 rounded-full border border-line"></span>
               <span class="h-2.5 w-2.5 rounded-full border border-line"></span>
-
-              <div role="tablist" aria-label="Hero window" class="ml-2 flex">
-                @for (t of tabs; track t.id) {
-                  <button
-                    type="button"
-                    role="tab"
-                    [id]="'hero-tab-' + t.id"
-                    [attr.aria-selected]="tab() === t.id"
-                    [attr.aria-controls]="'hero-panel-' + t.id"
-                    (click)="select(t.id)"
-                    class="relative inline-flex min-h-11 items-center gap-1.5 px-3 font-mono text-[0.6875rem] tracking-[0.1em] transition-colors"
-                    [class.text-ink]="tab() === t.id"
-                    [class.text-ink-faint]="tab() !== t.id"
-                    [class.hover:text-ink-dim]="tab() !== t.id"
-                  >
-                    {{ t.label }}
-                    @if (t.id === 'terminal' && !termOpened()) {
-                      <span class="relative flex h-1.5 w-1.5" aria-hidden="true">
-                        <span class="u-pulse-ring absolute inline-flex h-full w-full rounded-full bg-accent"></span>
-                        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent"></span>
-                      </span>
-                    }
-                    <span
-                      class="absolute inset-x-3 -bottom-px h-px bg-accent transition-opacity"
-                      [class.opacity-0]="tab() !== t.id"
-                    ></span>
-                  </button>
-                }
-              </div>
+              <span class="ml-2 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-faint">
+                engineer.yaml
+              </span>
             </div>
 
-            <!-- The yaml panel always sets the window's height; the terminal
-                 overlays it, so switching tabs never shifts the layout. -->
-            <div class="relative">
-              <dl
-                id="hero-panel-yaml"
-                role="tabpanel"
-                aria-labelledby="hero-tab-yaml"
-                class="space-y-0 p-4 font-mono text-[0.7rem] leading-7 sm:p-5 sm:text-[0.78rem]"
-                [class.invisible]="tab() !== 'yaml'"
-                [attr.inert]="tab() !== 'yaml' ? '' : null"
-              >
-                @for (row of manifest; track row.key) {
-                  <div class="flex gap-3">
-                    <dt class="shrink-0 text-ink-faint">{{ row.key }}:</dt>
-                    <dd class="text-ink-dim">{{ row.value }}</dd>
-                  </div>
-                }
-                <div class="flex gap-3">
-                  <dt class="shrink-0 text-ink-faint">stack:</dt>
-                  <dd class="sr-only">{{ stackLabel }}</dd>
-                </div>
-                <ul class="ml-4 list-none space-y-0" aria-hidden="true">
-                  @for (item of stack; track item) {
-                    <li class="flex items-center gap-2 text-accent">
-                      <span class="text-ink-faint">-</span>
-                      <app-tech-icon [name]="item" cls="h-3.5 w-3.5 opacity-90" />
-                      <span>{{ item }}</span>
-                    </li>
-                  }
-                </ul>
-              </dl>
-
-              @if (termOpened()) {
-                <div
-                  id="hero-panel-terminal"
-                  role="tabpanel"
-                  aria-labelledby="hero-tab-terminal"
-                  class="absolute inset-0"
-                  [class.hidden]="tab() !== 'terminal'"
-                >
-                  <app-terminal (exit)="select('yaml')" />
+            <dl class="space-y-0 p-4 font-mono text-[0.7rem] leading-7 sm:p-5 sm:text-[0.78rem]">
+              @for (row of manifest; track row.key) {
+                <div class="u-enter flex gap-3" [style.--d.ms]="560 + $index * 35">
+                  <dt class="shrink-0 text-ink-faint">{{ row.key }}:</dt>
+                  <dd class="text-ink-dim">{{ row.value }}</dd>
                 </div>
               }
-            </div>
+              <div class="u-enter flex gap-3" [style.--d.ms]="560 + manifest.length * 35">
+                <dt class="shrink-0 text-ink-faint">stack:</dt>
+                <dd class="sr-only">{{ stackLabel }}</dd>
+              </div>
+              <ul class="ml-4 list-none space-y-0" aria-hidden="true">
+                @for (item of stack; track item) {
+                  <li
+                    class="u-enter flex items-center gap-2 text-accent"
+                    [style.--d.ms]="560 + (manifest.length + 1 + $index) * 35"
+                  >
+                    <span class="text-ink-faint">-</span>
+                    <app-tech-icon [name]="item" cls="h-3.5 w-3.5 opacity-90" />
+                    <span>{{ item }}</span>
+                  </li>
+                }
+              </ul>
+            </dl>
           </div>
         </div>
       </div>
 
       <a
         href="#about"
-        class="absolute bottom-8 left-1/2 hidden -translate-x-1/2 text-ink-faint transition-colors hover:text-accent md:block"
+        class="u-enter absolute bottom-8 left-1/2 hidden -translate-x-1/2 text-ink-faint transition-colors hover:text-accent md:block"
+        style="--d: 1100ms"
         aria-label="Scroll to about"
       >
-        <app-icon name="arrow-down" cls="h-5 w-5" />
+        <app-icon name="arrow-down" cls="h-5 w-5" class="u-bob block" />
       </a>
     </section>
   `,
@@ -258,31 +220,10 @@ import { PaletteService } from '../shared/command-palette.component';
 export class HeroComponent {
   protected readonly profile = PROFILE;
 
-  protected readonly tabs = [
-    { id: 'yaml', label: 'engineer.yaml' },
-    { id: 'terminal', label: 'terminal' },
-  ] as const;
-  protected readonly tab = signal<'yaml' | 'terminal'>('yaml');
-  /** The terminal mounts on first visit and then stays, keeping its history. */
-  protected readonly termOpened = signal(false);
-  private readonly terminal = viewChild(TerminalComponent);
-
   /** Wall-clock time in Bengaluru, filled in after hydration. */
   protected readonly localTime = signal('');
 
   constructor() {
-    const palette = inject(PaletteService);
-    let seen = palette.terminalRequests();
-    effect(() => {
-      const requests = palette.terminalRequests();
-      if (requests === seen) return;
-      seen = requests;
-      untracked(() => {
-        document.getElementById('top')?.scrollIntoView();
-        this.select('terminal');
-      });
-    });
-
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
       const format = new Intl.DateTimeFormat('en-US', {
@@ -295,15 +236,6 @@ export class HeroComponent {
       const timer = setInterval(tick, 15_000);
       destroyRef.onDestroy(() => clearInterval(timer));
     });
-  }
-
-  protected select(id: 'yaml' | 'terminal'): void {
-    this.tab.set(id);
-    if (id === 'terminal') {
-      this.termOpened.set(true);
-      // Focus once the panel exists and is visible.
-      setTimeout(() => this.terminal()?.focus());
-    }
   }
 
   protected readonly manifest = [
