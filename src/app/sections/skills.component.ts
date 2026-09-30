@@ -75,7 +75,9 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
 
             <ul class="mt-4 flex flex-wrap gap-2">
               @for (item of group.items; track item) {
-                <li>
+                <!-- flex, not block: an inline pill with no icon sat on a
+                     different baseline and rode lower than its neighbours. -->
+                <li class="flex">
                   @if (filter.isFilterable(item)) {
                     <button
                       type="button"

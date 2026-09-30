@@ -138,7 +138,7 @@ export class ContactComponent {
     {
       icon: 'linkedin',
       label: 'LinkedIn',
-      value: 'in/vivek-k-87036b104',
+      value: PROFILE.linkedin.replace(/^https:\/\/www\.linkedin\.com\/|\/$/g, ''),
       href: PROFILE.linkedin,
       external: true,
     },
