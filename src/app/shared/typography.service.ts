@@ -38,7 +38,7 @@ export const FONT_OPTIONS: ReadonlyArray<{
   {
     id: 'sans',
     label: 'Modern Sans',
-    family: 'Inter + Fraunces',
+    family: 'Inter + Space Grotesk',
     stack: '"Inter", ui-sans-serif, system-ui, sans-serif',
   },
   {

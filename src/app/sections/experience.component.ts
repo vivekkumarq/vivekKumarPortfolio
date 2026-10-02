@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 
 import { EXPERIENCE, type Role } from '../core/profile';
 import { IconComponent } from '../shared/icon.component';
@@ -16,7 +11,7 @@ import { SectionComponent } from '../shared/section.component';
 export type ExperienceView = 'quick' | 'deep';
 
 /**
- * One entry on the experience timeline.
+ * One role, as a dashboard card.
  *
  * Renders both cuts of the role and lets the animated `.u-collapse`
  * containers swap between them: `quick` is the recruiter scan (two lines,
@@ -30,60 +25,55 @@ export type ExperienceView = 'quick' | 'deep';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IconComponent, TechIconComponent, RichTextComponent],
   template: `
-    <article class="relative border-l border-line pl-6 sm:pl-9">
-      <!-- Timeline node, aligned to the role title -->
-      <span
-        class="absolute left-0 top-2 flex h-2.5 w-2.5 -translate-x-1/2 items-center justify-center"
-      >
-        @if (role().current) {
-          <span
-            class="u-pulse-ring absolute inline-flex h-2.5 w-2.5 rounded-full bg-accent/50"
-          ></span>
-          <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent"></span>
-        } @else {
-          <span
-            class="relative inline-flex h-2.5 w-2.5 rounded-full border border-line bg-canvas"
-          ></span>
-        }
-      </span>
+    <article
+      class="u-card overflow-hidden p-6 md:p-8"
+      style="background-image: radial-gradient(700px 260px at 100% 0, color-mix(in srgb, var(--c-accent) 10%, transparent), transparent 70%)"
+    >
+      <header class="flex flex-wrap items-start gap-4">
+        <span class="u-chip-ico h-12 w-12 rounded-2xl" style="--tone: var(--t-blue)">
+          <app-icon name="briefcase" cls="h-5 w-5" />
+        </span>
 
-      <header>
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <h3 class="u-display text-2xl text-ink sm:text-3xl">{{ role().title }}</h3>
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h3 class="u-display text-[1.6rem] leading-tight text-ink sm:text-[1.9rem]">
+              {{ role().title }}
+            </h3>
+            @if (role().current) {
+              <span
+                class="inline-flex items-center gap-1.5 rounded-full bg-green/12 px-2.5 py-1 text-[0.7rem] font-semibold text-green"
+              >
+                <span class="u-live h-1.5 w-1.5"></span>
+                Current
+              </span>
+            }
+          </div>
 
-          @if (role().current) {
-            <span
-              class="rounded-full border border-accent/40 px-2.5 py-0.5 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-accent"
-            >
-              Current
-            </span>
-          }
+          <p class="mt-1 text-[0.95rem] text-ink-dim">
+            @if (role().companyUrl; as url) {
+              <a
+                [href]="url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="u-link-underline font-semibold text-ink transition-colors hover:text-accent"
+              >
+                {{ role().company }}
+              </a>
+            } @else {
+              <span class="font-semibold text-ink">{{ role().company }}</span>
+            }
+          </p>
         </div>
 
-        <p class="mt-1.5 text-[0.95rem] text-ink-dim">
-          @if (role().companyUrl; as url) {
-            <a
-              [href]="url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="u-link-underline text-ink transition-colors hover:text-accent"
+        <ul class="flex flex-wrap gap-2 text-[0.75rem]">
+          @for (m of meta(); track m) {
+            <li
+              class="rounded-full border border-line bg-raised px-3 py-1 font-medium text-ink-dim"
             >
-              {{ role().company }}
-            </a>
-          } @else {
-            <span class="text-ink">{{ role().company }}</span>
+              {{ m }}
+            </li>
           }
-        </p>
-
-        <div
-          class="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-ink-faint"
-        >
-          <span>{{ role().period }}</span>
-          <span class="h-px w-3 bg-line"></span>
-          <span>{{ role().employment }}</span>
-          <span class="h-px w-3 bg-line"></span>
-          <span>{{ role().location }}</span>
-        </div>
+        </ul>
       </header>
 
       <!-- Quick view: the 30-second scan -->
@@ -93,13 +83,13 @@ export type ExperienceView = 'quick' | 'deep';
         [attr.inert]="mode() === 'quick' ? null : ''"
       >
         <div>
-          <ul class="mt-6 space-y-3">
+          <ul class="mt-6 grid gap-3 md:grid-cols-2">
             @for (line of role().quick; track line) {
-              <li class="flex gap-3">
-                <span class="mt-[0.3rem] shrink-0 text-accent">
-                  <app-icon name="chevron-right" cls="h-3.5 w-3.5" />
+              <li class="flex gap-3 rounded-2xl border border-line bg-raised p-4">
+                <span class="mt-0.5 shrink-0 text-accent">
+                  <app-icon name="check" cls="h-4 w-4" />
                 </span>
-                <p class="text-[0.95rem] leading-relaxed text-ink-dim">
+                <p class="text-[0.925rem] leading-relaxed text-ink-dim">
                   <app-rich [text]="line" />
                 </p>
               </li>
@@ -115,28 +105,26 @@ export type ExperienceView = 'quick' | 'deep';
         [attr.inert]="mode() === 'deep' ? null : ''"
       >
         <div>
-          <p class="mt-5 max-w-2xl text-[0.95rem] leading-relaxed text-ink-dim">
+          <p class="mt-6 max-w-3xl text-[0.95rem] leading-relaxed text-ink-dim">
             {{ role().summary }}
           </p>
 
-          <ul class="mt-6 space-y-3.5">
+          <ul class="mt-5 grid gap-3 md:grid-cols-2">
             @for (bullet of role().bullets; track bullet.text) {
-              <li class="flex gap-3">
-                <span class="mt-[0.3rem] shrink-0 text-accent">
-                  <app-icon name="chevron-right" cls="h-3.5 w-3.5" />
+              <li class="flex gap-3 rounded-2xl border border-line bg-raised p-4">
+                <span class="mt-0.5 shrink-0 text-accent">
+                  <app-icon name="chevron-right" cls="h-4 w-4" />
                 </span>
-
                 <div class="min-w-0">
-                  <p class="text-[0.925rem] leading-relaxed text-ink-dim">
+                  <p class="text-[0.9rem] leading-relaxed text-ink-dim">
                     <app-rich [text]="bullet.text" />
                   </p>
-
                   @if (bullet.metric; as metric) {
                     <span
-                      class="mt-2 inline-flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-md border border-line bg-raised px-2.5 py-1"
+                      class="mt-2 inline-flex flex-wrap items-baseline gap-x-2 rounded-lg bg-accent/10 px-2.5 py-1"
                     >
-                      <span class="font-mono text-sm text-accent">{{ metric.value }}</span>
-                      <span class="text-[0.6875rem] text-ink-faint">{{ metric.label }}</span>
+                      <span class="u-num text-sm text-accent">{{ metric.value }}</span>
+                      <span class="text-[0.72rem] text-ink-dim">{{ metric.label }}</span>
                     </span>
                   }
                 </div>
@@ -146,12 +134,12 @@ export type ExperienceView = 'quick' | 'deep';
         </div>
       </div>
 
-      <ul class="mt-8 flex flex-wrap gap-2">
+      <ul class="mt-6 flex flex-wrap gap-2 border-t border-line pt-5">
         @for (tech of role().stack; track tech) {
           <li
-            class="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.6875rem] tracking-[0.06em] text-ink-dim transition-colors hover:border-accent hover:text-accent"
+            class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-[0.78rem] font-medium text-ink-dim transition-colors hover:border-accent hover:text-accent"
           >
-            <app-tech-icon [name]="tech" cls="h-3 w-3" />
+            <app-tech-icon [name]="tech" cls="h-3.5 w-3.5" />
             {{ tech }}
           </li>
         }
@@ -162,11 +150,16 @@ export type ExperienceView = 'quick' | 'deep';
 export class RoleEntryComponent {
   readonly role = input.required<Role>();
   readonly mode = input.required<ExperienceView>();
+
+  protected meta(): string[] {
+    const r = this.role();
+    return [r.period, r.employment, r.location];
+  }
 }
 
 /**
- * Experience section — a vertical timeline over `EXPERIENCE`, with a
- * section-level switch between the recruiter cut and the full record.
+ * Experience section — role cards over `EXPERIENCE`, with a section-level
+ * switch between the recruiter cut and the full record.
  */
 @Component({
   selector: 'app-experience',
@@ -180,40 +173,25 @@ export class RoleEntryComponent {
       heading="Experience"
       [lead]="lead"
     >
-      <!-- View-mode switch -->
-      <div appReveal class="mb-10 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <div
-          role="group"
-          aria-label="Experience detail level"
-          class="inline-flex rounded-full border border-line bg-surface p-1"
-        >
+      <div sectionActions class="flex flex-col items-start gap-2 sm:items-end">
+        <div role="group" aria-label="Experience detail level" class="u-seg">
           <button
             type="button"
             (click)="mode.set('quick')"
             [attr.aria-pressed]="mode() === 'quick'"
-            [class]="mode() === 'quick' ? segActive : segIdle"
           >
             Quick view
           </button>
-          <button
-            type="button"
-            (click)="mode.set('deep')"
-            [attr.aria-pressed]="mode() === 'deep'"
-            [class]="mode() === 'deep' ? segActive : segIdle"
-          >
+          <button type="button" (click)="mode.set('deep')" [attr.aria-pressed]="mode() === 'deep'">
             Deep dive
           </button>
         </div>
-
-        <p
-          class="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-faint uppercase"
-          role="status"
-        >
+        <p class="text-[0.75rem] text-ink-faint" role="status">
           {{ mode() === 'quick' ? 'The 30-second scan' : 'Architecture, ownership and detail' }}
         </p>
       </div>
 
-      <div class="space-y-16">
+      <div class="space-y-5">
         @for (role of experience; track role.company) {
           <div appReveal [i]="$index">
             <app-role-entry [role]="role" [mode]="mode()" />
@@ -230,9 +208,4 @@ export class ExperienceComponent {
   protected readonly experience: Role[] = EXPERIENCE;
 
   protected readonly mode = signal<ExperienceView>('quick');
-
-  protected readonly segActive =
-    'rounded-full bg-accent px-4 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-canvas transition-colors';
-  protected readonly segIdle =
-    'rounded-full px-4 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-dim transition-colors hover:text-ink';
 }

@@ -27,12 +27,22 @@ import { PaletteService } from '../shared/command-palette.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IconComponent, FontMenuComponent, ThemeMenuComponent],
   template: `
+    <!-- Over the always-dark hero the header switches its colour tokens to
+         light-on-dark (u-on-hero); past the hero it becomes a frosted bar
+         in the page theme. -->
     <header
       class="u-enter-down fixed inset-x-0 top-0 z-50 transition-colors duration-300"
-      [class.border-b]="scrolled()"
-      [class.border-line]="scrolled()"
-      [style.background-color]="scrolled() ? 'color-mix(in srgb, var(--c-canvas) 82%, transparent)' : 'transparent'"
-      [style.backdrop-filter]="scrolled() ? 'blur(12px)' : 'none'"
+      [class.u-on-hero]="onHero()"
+      [class.border-b]="!onHero()"
+      [class.border-line]="!onHero()"
+      [style.background-color]="
+        onHero()
+          ? scrolled()
+            ? 'rgb(6 9 18 / 0.55)'
+            : 'transparent'
+          : 'color-mix(in srgb, var(--c-canvas) 82%, transparent)'
+      "
+      [style.backdrop-filter]="scrolled() ? 'blur(14px) saturate(140%)' : 'none'"
     >
       <nav class="u-shell flex h-16 items-center justify-between gap-4" aria-label="Primary">
         <!-- Monogram -->
@@ -40,10 +50,16 @@ import { PaletteService } from '../shared/command-palette.component';
              gives the link a full-size tap target. -->
         <a
           href="#top"
-          class="-m-2 inline-flex min-h-11 items-center p-2 u-display text-xl tracking-tight text-ink transition-colors hover:text-accent"
+          class="-m-2 inline-flex min-h-11 items-center gap-2.5 p-2 text-ink"
           aria-label="Back to top"
         >
-          {{ initials }}<span class="text-accent">.</span>
+          <span
+            class="grid h-8 w-8 place-items-center rounded-[0.6rem] bg-linear-to-br from-teal-300 via-sky-300 to-violet-400 text-[0.78rem] font-extrabold text-[#0b1020] shadow-lg shadow-black/30"
+            aria-hidden="true"
+          >
+            {{ initials }}
+          </span>
+          <span class="hidden text-[0.95rem] font-bold tracking-tight sm:inline">{{ name }}</span>
         </a>
 
         <!-- Desktop links -->
@@ -93,7 +109,7 @@ import { PaletteService } from '../shared/command-palette.component';
           <a
             [href]="resumePath"
             download
-            class="hidden min-h-11 items-center gap-2 rounded-full border border-line px-4 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-dim uppercase transition-colors hover:border-accent hover:text-accent sm:inline-flex md:hidden md:min-h-9 lg:inline-flex"
+            class="hidden min-h-11 items-center gap-2 rounded-full border border-line px-4 text-[0.8rem] font-semibold text-ink-dim transition-colors hover:border-accent hover:text-accent sm:inline-flex md:hidden md:min-h-9 lg:inline-flex"
           >
             <app-icon name="download" cls="h-3.5 w-3.5" />
             Résumé
@@ -175,6 +191,9 @@ export class NavComponent {
 
   protected readonly links = NAV_LINKS;
   protected readonly initials = PROFILE.initials;
+  protected readonly name = PROFILE.name;
+  /** True while the header still sits over the dark hero. */
+  protected readonly onHero = signal(true);
   protected readonly resumePath = PROFILE.resumePath;
 
   protected readonly menuOpen = signal(false);
@@ -229,6 +248,12 @@ export class NavComponent {
   private watchScroll(): void {
     const onScroll = () => {
       this.scrolled.set(window.scrollY > 12);
+      const hero = document.getElementById('top');
+      this.onHero.set(!!hero && window.scrollY < hero.offsetHeight - 72);
+      if (this.onHero() && this.active()) {
+        this.active.set('');
+        this.movePill();
+      }
       // A page shorter than the viewport has nothing to scroll; treat it as
       // fully read rather than dividing by zero.
       const scrollable =

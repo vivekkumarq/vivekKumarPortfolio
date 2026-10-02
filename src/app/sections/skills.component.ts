@@ -4,20 +4,20 @@ import { RevealDirective } from '../shared/reveal.directive';
 import { IconComponent } from '../shared/icon.component';
 import { TechIconComponent } from '../shared/tech-icon.component';
 import { SkillFilterService } from '../shared/skill-filter.service';
-import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
+import { COMPETENCIES, PROJECTS, SKILLS } from '../core/profile';
+
+const BAR_TONES = ['blue', 'violet', 'teal', 'pink', 'amber', 'green'] as const;
 
 /**
  * Skills & competencies.
  *
- * Three blocks, deliberately decreasing in weight:
- *   1. grouped skill pills (the substance) — pills that map onto at least
- *      one project are buttons that filter the Projects section below;
- *      the rest stay plain text rather than offering a dead-end filter
- *   2. a slow marquee strip (texture — the list is rendered twice because
- *      `.u-marquee` translates -50%)
- *   3. core competencies as a light footnote row
- *
- * No proficiency bars, meters or star ratings — they encode nothing real.
+ *   1. "Where it shows up" — one bar per technology, its length the number of
+ *      projects on this page that use it. A count, not a proficiency score:
+ *      no meters or star ratings that encode nothing real. Bars, like the
+ *      pills, filter the Projects section.
+ *   2. Core competencies, beside it.
+ *   3. Grouped skill pills. Pills that map onto at least one project are
+ *      buttons; the rest stay plain text rather than offer a dead-end filter.
  */
 @Component({
   selector: 'app-skills',
@@ -31,49 +31,104 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
       heading="Skills &amp; Competencies"
       [lead]="lead"
     >
-      <!-- Filter state row -->
-      <div appReveal class="mb-6 flex min-h-9 flex-wrap items-center gap-x-3 gap-y-2">
-        <button
-          type="button"
-          (click)="filter.clear()"
-          [attr.aria-pressed]="filter.active() === null"
-          [class]="filter.active() === null ? pillActive : pillIdle"
-        >
-          All skills
-        </button>
+      <div class="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+        <!-- 1 ─ Where it shows up -->
+        <div appReveal class="u-card p-5 md:p-6">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="text-[0.95rem] font-semibold text-ink">Where it shows up</h3>
+            <p class="text-[0.75rem] text-ink-faint">Projects using each · click to filter</p>
+          </div>
 
-        @if (filter.active(); as active) {
-          <p class="text-[0.8125rem] text-ink-dim" role="status">
-            Filtering projects by
-            <span class="font-mono text-accent">{{ active }}</span>
-            —
-            <a href="#projects" class="u-link-underline text-ink transition-colors hover:text-accent">
-              see them below ↓
-            </a>
-          </p>
-        } @else {
-          <p class="text-[0.8125rem] text-ink-faint">
-            Skills with a
-            <span class="font-mono text-ink-dim">count</span>
-            filter the projects section — click one.
-          </p>
-        }
+          <ul class="mt-4 grid gap-1">
+            @for (bar of bars; track bar.label; let i = $index) {
+              <li>
+                <button
+                  type="button"
+                  (click)="filter.toggle(bar.label)"
+                  [attr.aria-pressed]="filter.isActive(bar.label)"
+                  [attr.aria-label]="
+                    bar.label + ': ' + bar.count + ' of ' + total + ' projects. Filter projects'
+                  "
+                  class="grid w-full grid-cols-[8.5rem_1fr_3rem] items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-raised sm:grid-cols-[10rem_1fr_3.25rem]"
+                  [class.bg-raised]="filter.isActive(bar.label)"
+                >
+                  <span class="flex min-w-0 items-center gap-2 text-[0.85rem] font-medium text-ink">
+                    <app-tech-icon [name]="bar.label" cls="h-3.5 w-3.5 shrink-0" />
+                    <span class="truncate">{{ bar.label }}</span>
+                  </span>
+                  <span class="h-2.5 overflow-hidden rounded-full bg-raised">
+                    <span
+                      class="u-bar block h-full rounded-full"
+                      [style.--i]="i"
+                      [style.width.%]="(bar.count / total) * 100"
+                      [style.background]="'var(--t-' + bar.tone + ')'"
+                      [style.opacity]="filter.active() && !filter.isActive(bar.label) ? 0.35 : 1"
+                    ></span>
+                  </span>
+                  <span class="u-num text-right text-[0.85rem] text-ink-dim">
+                    {{ bar.count }}<span class="text-ink-faint">/{{ total }}</span>
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- 2 ─ Competencies + filter state -->
+        <div appReveal [i]="1" class="u-card flex flex-col p-5 md:p-6">
+          <h3 class="text-[0.95rem] font-semibold text-ink">Core competencies</h3>
+          <ul class="mt-4 flex flex-wrap gap-2">
+            @for (item of competencies; track item) {
+              <li
+                class="rounded-full border border-line bg-raised px-3 py-1 text-[0.78rem] font-medium text-ink-dim"
+              >
+                {{ item }}
+              </li>
+            }
+          </ul>
+
+          <div class="mt-auto pt-5">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl bg-raised p-3.5">
+              <button
+                type="button"
+                (click)="filter.clear()"
+                [attr.aria-pressed]="filter.active() === null"
+                [class]="filter.active() === null ? pillActive : pillIdle"
+              >
+                All skills
+              </button>
+              @if (filter.active(); as active) {
+                <p class="text-[0.8125rem] text-ink-dim" role="status">
+                  Filtering projects by <b class="text-accent">{{ active }}</b> —
+                  <a href="#projects" class="u-link-underline font-medium text-ink hover:text-accent"
+                    >see them ↓</a
+                  >
+                </p>
+              } @else {
+                <p class="text-[0.8125rem] text-ink-faint">
+                  Pick a bar or a counted skill to filter the projects.
+                </p>
+              }
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- 1 ─ Skill groups -->
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        @for (group of groups; track group.group) {
-          <div
-            appReveal
-            [i]="$index"
-            class="u-card min-w-0 p-5 md:p-6"
-          >
-            <h3 class="u-eyebrow flex items-center gap-2">
-              <app-icon [name]="group.icon" cls="h-3.5 w-3.5" />
+      <!-- 3 ─ Skill groups -->
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        @for (group of groups; track group.group; let i = $index) {
+          <div appReveal [i]="i % 4" class="u-card min-w-0 p-5">
+            <h3 class="flex items-center gap-2.5 text-[0.9rem] font-semibold text-ink">
+              <span
+                class="u-chip-ico h-8 w-8 rounded-[0.6rem]"
+                [style.--tone]="'var(--t-' + tones[i % tones.length] + ')'"
+              >
+                <app-icon [name]="group.icon" cls="h-4 w-4" />
+              </span>
               {{ group.group }}
             </h3>
 
-            <ul class="mt-4 flex flex-wrap gap-2">
+            <ul class="mt-4 flex flex-wrap gap-1.5">
               @for (item of group.items; track item) {
                 <!-- flex, not block: an inline pill with no icon sat on a
                      different baseline and rode lower than its neighbours. -->
@@ -90,12 +145,10 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
                     >
                       <app-tech-icon [name]="item" cls="h-3 w-3" />
                       {{ item }}
-                      <span class="text-[0.6rem] opacity-70">{{ filter.countFor(item) }}</span>
+                      <span class="u-num text-[0.68rem] opacity-70">{{ filter.countFor(item) }}</span>
                     </button>
                   } @else {
-                    <span
-                      class="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.72rem] text-ink-dim"
-                    >
+                    <span class="{{ skillStatic }}">
                       <app-tech-icon [name]="item" cls="h-3 w-3" />
                       {{ item }}
                     </span>
@@ -105,72 +158,6 @@ import { SKILLS, SKILL_TICKER, COMPETENCIES } from '../core/profile';
             </ul>
           </div>
         }
-      </div>
-
-      <!-- 2 ─ Ticker -->
-      <div
-        appReveal
-        class="u-marquee-host relative mt-10 overflow-hidden border-y border-line-soft py-4"
-      >
-        <div class="u-marquee flex w-max items-center">
-          <ul class="flex shrink-0 items-center">
-            @for (chip of ticker; track chip) {
-              <li class="flex shrink-0 items-center gap-5 px-5">
-                <span
-                  class="font-mono text-[0.7rem] tracking-[0.16em] whitespace-nowrap
-                         text-ink-faint uppercase"
-                >
-                  {{ chip }}
-                </span>
-                <span class="h-1 w-1 shrink-0 rounded-full bg-accent opacity-40"></span>
-              </li>
-            }
-          </ul>
-
-          <ul aria-hidden="true" class="flex shrink-0 items-center">
-            @for (chip of ticker; track chip) {
-              <li class="flex shrink-0 items-center gap-5 px-5">
-                <span
-                  class="font-mono text-[0.7rem] tracking-[0.16em] whitespace-nowrap
-                         text-ink-faint uppercase"
-                >
-                  {{ chip }}
-                </span>
-                <span class="h-1 w-1 shrink-0 rounded-full bg-accent opacity-40"></span>
-              </li>
-            }
-          </ul>
-        </div>
-
-        <!-- Edge fades. Inline gradients so both themes resolve from the token. -->
-        <div
-          class="pointer-events-none absolute inset-y-0 left-0 w-12 md:w-20"
-          style="background-image: linear-gradient(to right, var(--c-canvas), transparent)"
-          aria-hidden="true"
-        ></div>
-        <div
-          class="pointer-events-none absolute inset-y-0 right-0 w-12 md:w-20"
-          style="background-image: linear-gradient(to left, var(--c-canvas), transparent)"
-          aria-hidden="true"
-        ></div>
-      </div>
-
-      <!-- 3 ─ Core competencies (footnote weight) -->
-      <div appReveal [i]="1" class="mt-10">
-        <h3 class="font-mono text-[0.6875rem] tracking-[0.18em] text-ink-faint uppercase">
-          Core Competencies
-        </h3>
-
-        <ul class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-          @for (item of competencies; track item; let last = $last) {
-            <li class="flex items-center gap-2">
-              <span class="font-mono text-[0.72rem] text-ink-dim">{{ item }}</span>
-              @if (!last) {
-                <span class="text-[0.72rem] text-accent opacity-50" aria-hidden="true">/</span>
-              }
-            </li>
-          }
-        </ul>
       </div>
     </app-section>
   `,
@@ -182,16 +169,29 @@ export class SkillsComponent {
   protected readonly filter = inject(SkillFilterService);
 
   protected readonly groups = SKILLS;
-  protected readonly ticker = SKILL_TICKER;
   protected readonly competencies = COMPETENCIES;
+  protected readonly tones = BAR_TONES;
+  protected readonly total = PROJECTS.length;
+
+  /**
+   * Skills used by at least two projects, most-used first. Ties keep the
+   * order of the skills list, so the chart reads like the résumé.
+   */
+  protected readonly bars = SKILLS.flatMap((g) => g.items)
+    .map((label) => ({ label, count: this.filter.countFor(label) }))
+    .filter((b) => b.count >= 2)
+    .sort((a, b) => b.count - a.count)
+    .map((b, i) => ({ ...b, tone: BAR_TONES[i % BAR_TONES.length] }));
 
   /* Pill styling, shared between the reset control and the skill buttons. */
   protected readonly pillActive =
-    'rounded-full border border-accent bg-accent/10 px-3.5 py-1 font-mono text-[0.72rem] text-accent transition-colors';
+    'rounded-full border border-accent bg-accent/12 px-3.5 py-1 text-[0.78rem] font-semibold text-accent transition-colors';
   protected readonly pillIdle =
-    'rounded-full border border-line bg-raised px-3.5 py-1 font-mono text-[0.72rem] text-ink-dim transition-colors hover:border-accent hover:text-accent';
+    'rounded-full border border-line bg-surface px-3.5 py-1 text-[0.78rem] font-medium text-ink-dim transition-colors hover:border-accent hover:text-accent';
   protected readonly skillActive =
-    'inline-flex items-center gap-1.5 rounded-full border border-accent bg-accent/10 px-3 py-1 font-mono text-[0.72rem] text-accent transition-colors';
+    'inline-flex items-center gap-1.5 rounded-full border border-accent bg-accent/12 px-2.5 py-1 text-[0.78rem] font-semibold text-accent transition-colors';
   protected readonly skillIdle =
-    'inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1 font-mono text-[0.72rem] text-ink-dim transition-colors hover:border-accent hover:text-accent';
+    'inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 text-[0.78rem] font-medium text-ink-dim transition-colors hover:border-accent hover:text-accent';
+  protected readonly skillStatic =
+    'inline-flex items-center gap-1.5 rounded-full border border-line-soft px-2.5 py-1 text-[0.78rem] text-ink-faint';
 }

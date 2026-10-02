@@ -10,8 +10,13 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-num: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
 
+/* inline: utilities reference the tokens themselves rather than a value
+   resolved once on :root, so token overrides on a subtree take effect. */
+@theme inline {
   --color-ink: var(--c-ink);
   --color-ink-dim: var(--c-ink-dim);
   --color-ink-faint: var(--c-ink-faint);
@@ -23,45 +28,75 @@
   --color-accent: var(--c-accent);
   --color-accent-dim: var(--c-accent-dim);
   --color-gold: var(--c-gold);
+  --color-on-accent: var(--c-on-accent);
+
+  /* Tones for icon chips, chart bars and badges. Each theme sets its own
+     values so a tone stays readable on that theme's surfaces. */
+  --color-teal: var(--t-teal);
+  --color-violet: var(--t-violet);
+  --color-pink: var(--t-pink);
+  --color-amber: var(--t-amber);
+  --color-green: var(--t-green);
+  --color-blue: var(--t-blue);
 }
 
 :root {
-  --c-canvas: #0a0c0e;
-  --c-surface: #101316;
-  --c-raised: #161a1e;
-  --c-line: #232a30;
-  --c-line-soft: #191e23;
-  --c-ink: #e8ebed;
-  --c-ink-dim: #9aa4ad;
-  --c-ink-faint: #6b757d;
-  --c-accent: #5ec8ad;
-  --c-accent-dim: #2f6d5f;
-  --c-gold: #d9a441;
-  --dot: rgba(255, 255, 255, 0.055);
-  --glow: rgba(94, 200, 173, 0.09);
+  --c-canvas: #0b0f17;
+  --c-surface: #121826;
+  --c-raised: #161d2d;
+  --c-line: #232b3b;
+  --c-line-soft: #1b2334;
+  --c-ink: #e5e9f0;
+  --c-ink-dim: #a3adbd;
+  --c-ink-faint: #7a8496;
+  --c-accent: #60a5fa;
+  --c-accent-dim: #1e3a8a;
+  --c-on-accent: #0b1220;
+  --c-gold: #facc15;
+  --dot: rgba(255, 255, 255, 0.05);
+  --glow: rgba(96, 165, 250, 0.1);
 
-  /* Display face settings — see .u-display. Change these three together
-     when swapping the family, and update the font link in index.html. */
-  --display-weight: 500;
-  --display-track: -0.025em;
+  --t-teal: #2dd4bf;
+  --t-violet: #a78bfa;
+  --t-pink: #f472b6;
+  --t-amber: #fbbf24;
+  --t-green: #4ade80;
+  --t-blue: #60a5fa;
+
+  --shadow: none;
+  --shadow-lift: 0 18px 40px -18px rgb(0 0 0 / 0.65);
+
+  /* Display face settings — see .u-display. Change these together when
+     swapping the family, and update the font link in index.html. */
+  --display-weight: 800;
+  --display-track: -0.04em;
 
   color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --c-canvas: #faf9f7;
+  --c-canvas: #f4f5f8;
   --c-surface: #ffffff;
-  --c-raised: #f3f2ef;
-  --c-line: #e0ddd7;
-  --c-line-soft: #eceae5;
-  --c-ink: #16191c;
-  --c-ink-dim: #59636b;
-  --c-ink-faint: #8a939a;
-  --c-accent: #16806a;
-  --c-accent-dim: #a8d8cb;
-  --c-gold: #a1741a;
-  --dot: rgba(0, 0, 0, 0.06);
-  --glow: rgba(22, 128, 106, 0.07);
+  --c-raised: #f8fafc;
+  --c-line: #e5e7eb;
+  --c-line-soft: #eef0f4;
+  --c-ink: #0f172a;
+  --c-ink-dim: #475569;
+  --c-ink-faint: #64748b;
+  --c-accent: #2563eb;
+  --c-accent-dim: #bfdbfe;
+  --c-gold: #b45309;
+  --dot: rgba(15, 23, 42, 0.06);
+  --glow: rgba(37, 99, 235, 0.07);
+  --c-on-accent: #ffffff;
+  --t-teal: #0d9488;
+  --t-violet: #7c3aed;
+  --t-pink: #db2777;
+  --t-amber: #d97706;
+  --t-green: #16a34a;
+  --t-blue: #2563eb;
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 6px 20px rgb(15 23 42 / 0.06);
+  --shadow-lift: 0 14px 32px -12px rgb(15 23 42 / 0.25);
   color-scheme: light;
 }
 
@@ -79,6 +114,7 @@
   --c-ink-dim: #93a5b8;
   --c-ink-faint: #64778a;
   --c-accent: #4cc4f0;
+  --c-on-accent: #0b1220;
   --c-accent-dim: #1d5f7d;
   --c-gold: #d9a441;
   --dot: rgba(120, 190, 255, 0.06);
@@ -96,6 +132,7 @@
   --c-ink-dim: #b3a396;
   --c-ink-faint: #82756a;
   --c-accent: #f0a35e;
+  --c-on-accent: #0b1220;
   --c-accent-dim: #7d4f26;
   --c-gold: #e0b85c;
   --dot: rgba(255, 190, 130, 0.055);
@@ -113,6 +150,7 @@
   --c-ink-dim: #a49cc0;
   --c-ink-faint: #756d92;
   --c-accent: #a78bfa;
+  --c-on-accent: #0b1220;
   --c-accent-dim: #4c3a86;
   --c-gold: #d9a441;
   --dot: rgba(180, 160, 255, 0.06);
@@ -134,6 +172,15 @@
   --c-gold: #8a6a1c;
   --dot: rgba(60, 40, 10, 0.06);
   --glow: rgba(154, 91, 44, 0.08);
+  --c-on-accent: #fffdf9;
+  --t-teal: #0d9488;
+  --t-violet: #7c3aed;
+  --t-pink: #db2777;
+  --t-amber: #d97706;
+  --t-green: #16a34a;
+  --t-blue: #2563eb;
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 6px 20px rgb(15 23 42 / 0.06);
+  --shadow-lift: 0 14px 32px -12px rgb(15 23 42 / 0.25);
   color-scheme: light;
 }
 
@@ -160,6 +207,9 @@
 
 [data-font="serif"] {
   --font-sans: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --display-weight: 500;
+  --display-track: -0.025em;
 }
 
 [data-font="rounded"] {
@@ -249,22 +299,30 @@ body {
 
 .u-shell {
   width: 100%;
-  max-width: 68rem;
+  max-width: 76rem;
   margin-inline: auto;
-  padding-inline: 1.5rem;
+  padding-inline: 1.25rem;
 }
 @media (min-width: 768px) {
   .u-shell {
-    padding-inline: 2.5rem;
+    padding-inline: 2rem;
   }
 }
 
 .u-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--c-accent);
+}
+
+/* Numerals in stats, clocks and counters. */
+.u-num {
+  font-family: var(--font-num);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Display face. Weight and tracking are tokens because different families
@@ -281,7 +339,8 @@ body {
   position: relative;
   background: var(--c-surface);
   border: 1px solid var(--c-line);
-  border-radius: 0.875rem;
+  border-radius: 1.125rem;
+  box-shadow: var(--shadow);
   transition:
     border-color 0.3s ease,
     background-color 0.3s ease,
@@ -407,7 +466,7 @@ html:has(.u-palette[open]) {
    one hard-coded colour. */
 .u-lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px -12px color-mix(in srgb, var(--c-accent) 45%, transparent);
+  box-shadow: var(--shadow-lift);
 }
 
 /* Display text that fades from the accent into the ink colour. Applied to the
@@ -686,4 +745,434 @@ html:has(.u-palette[open]) {
   .u-reveal .u-draw-rule {
     transform: none;
   }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   Dashboard design layer: the cinematic hero, glass, gradient type,
+   tone chips, buttons, the gallery and chart primitives.
+   ───────────────────────────────────────────────────────────── */
+
+@property --ang {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* In the components layer, so Tailwind utilities on the same element
+   (sizes, padding, white-space) override these defaults as intended. */
+@layer components {
+/* The hero is always dark, whatever the theme: it is a stage, not a page. */
+.u-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #060912;
+  color: #fff;
+}
+.u-hero-tint {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 55% at 88% 10%, rgb(168 85 247 / 0.32), transparent 70%),
+    radial-gradient(45% 55% at 2% 98%, rgb(20 184 166 / 0.3), transparent 70%),
+    radial-gradient(40% 40% at 55% 45%, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent 70%),
+    linear-gradient(0deg, rgb(6 9 18 / 0.95) 0%, transparent 32%);
+}
+.u-hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(80% 70% at 50% 40%, #000, transparent);
+  mask-image: radial-gradient(80% 70% at 50% 40%, #000, transparent);
+}
+
+/* Frosted panels and controls on the hero. */
+.u-glass {
+  background: rgb(255 255 255 / 0.07);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+}
+
+/* Multicolour type that drifts slowly through its own gradient. */
+.u-grad {
+  background-image: linear-gradient(90deg, #5eead4, #a78bfa, #f472b6, #fbbf24, #5eead4);
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: u-grad-shift 8s ease-in-out infinite alternate;
+}
+@keyframes u-grad-shift {
+  to {
+    background-position: 100% 0;
+  }
+}
+
+/* A light that travels round the border of a panel. */
+.u-conic::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--ang),
+    transparent 0 55%,
+    #5eead4 72%,
+    #c084fc 84%,
+    transparent 96%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: u-spin 6s linear infinite;
+  pointer-events: none;
+}
+@keyframes u-spin {
+  to {
+    --ang: 360deg;
+  }
+}
+
+/* Live dot with an expanding halo. */
+.u-live {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #22c55e;
+  flex: none;
+  animation: u-live 2s infinite;
+}
+@keyframes u-live {
+  0% {
+    box-shadow: 0 0 0 0 rgb(34 197 94 / 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgb(34 197 94 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(34 197 94 / 0);
+  }
+}
+
+/* Coloured icon chip. Set --tone on the element (a tone token). */
+.u-chip-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.375rem;
+  height: 2.375rem;
+  border-radius: 0.75rem;
+  color: var(--tone, var(--c-accent));
+  background: color-mix(in srgb, var(--tone, var(--c-accent)) 15%, transparent);
+}
+
+/* Buttons. */
+.u-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding-inline: 1.15rem;
+  border-radius: 0.8rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s var(--ease-out);
+}
+.u-btn:active {
+  transform: scale(0.97);
+}
+.u-btn-light {
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 14px 44px rgb(0 0 0 / 0.35);
+}
+.u-btn-light:hover {
+  box-shadow:
+    0 0 0 4px rgb(167 139 250 / 0.45),
+    0 14px 44px rgb(0 0 0 / 0.35);
+}
+.u-btn-glass {
+  color: #fff;
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.u-btn-glass:hover {
+  background: rgb(255 255 255 / 0.18);
+}
+.u-btn-accent {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+.u-btn-accent:hover {
+  box-shadow: 0 10px 26px -10px color-mix(in srgb, var(--c-accent) 80%, transparent);
+}
+.u-btn-soft {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  color: var(--c-ink);
+}
+.u-btn-soft:hover {
+  background: var(--c-raised);
+  border-color: color-mix(in srgb, var(--c-accent) 50%, var(--c-line));
+}
+
+/* Segmented control: a raised track with the active option lifted out. */
+.u-seg {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.85rem;
+  background: var(--c-raised);
+  border: 1px solid var(--c-line);
+}
+.u-seg > button {
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--c-ink-dim);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.u-seg > button:hover {
+  color: var(--c-ink);
+}
+.u-seg > button[aria-pressed="true"],
+.u-seg > button[aria-selected="true"] {
+  background: var(--c-surface);
+  color: var(--c-ink);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.16);
+}
+
+/* Odometer digit for the hero clock. */
+.u-roll {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+.u-roll-strip {
+  display: flex;
+  flex-direction: column;
+}
+.u-roll-strip.is-moving {
+  transition: transform 0.6s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+.u-roll-strip > span {
+  display: block;
+  height: 1em;
+  width: 0.62em;
+  text-align: center;
+}
+.u-blink {
+  animation: u-blink 1s ease-in-out infinite alternate;
+}
+@keyframes u-blink {
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* Highlights ticker along the foot of the hero. */
+.u-ticker {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+.u-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: u-marquee 70s linear infinite;
+}
+.u-ticker:hover .u-ticker-track {
+  animation-play-state: paused;
+}
+
+/* Project gallery: snap-scrolling cover cards. */
+.u-gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 17.5rem;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.25rem 0.125rem 1rem;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.u-gallery::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 640px) {
+  .u-gallery {
+    grid-auto-columns: 78%;
+  }
+}
+.u-gcard {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: 20rem;
+  border-radius: 1.25rem;
+  scroll-snap-align: start;
+  text-align: left;
+  color: #fff;
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s ease,
+    outline-color 0.2s ease;
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+}
+.u-gcard:hover,
+.u-gcard:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 22px 44px -16px rgb(0 0 0 / 0.55);
+}
+.u-gcard[aria-pressed="true"] {
+  outline-color: var(--c-accent);
+}
+.u-gcard-art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.u-gcard:hover .u-gcard-art {
+  transform: scale(1.08);
+}
+.u-gcard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.05) 30%, rgb(0 0 0 / 0.8));
+}
+
+/* Chart primitives: bars that grow, lines that draw. */
+@keyframes u-growx {
+  from {
+    transform: scaleX(0);
+  }
+}
+.u-bar {
+  transform-origin: left;
+  animation: u-growx 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+.u-reveal:not(.is-in) .u-bar {
+  animation-play-state: paused;
+}
+
+/* Back-to-top button. */
+.u-fab {
+  position: fixed;
+  right: 1.125rem;
+  bottom: max(1.125rem, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.22);
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s var(--ease-out);
+}
+.u-fab.is-shown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u-grad,
+  .u-conic::before,
+  .u-ticker-track,
+  .u-live {
+    animation: none !important;
+  }
+  .u-ticker {
+    overflow-x: auto;
+  }
+}
+}
+
+/* Header over the hero: light-on-dark tokens for everything inside it. The
+   theme's real values are kept as --*-theme on :root, so the dropdown
+   menus and the mobile sheet (which sit on theme surfaces) get them back. */
+:root {
+  --c-ink-theme: var(--c-ink);
+  --c-ink-dim-theme: var(--c-ink-dim);
+  --c-ink-faint-theme: var(--c-ink-faint);
+  --c-line-theme: var(--c-line);
+  --c-line-soft-theme: var(--c-line-soft);
+  --c-raised-theme: var(--c-raised);
+  --c-accent-theme: var(--c-accent);
+}
+.u-on-hero {
+  --c-ink: #ffffff;
+  --c-ink-dim: rgb(255 255 255 / 0.78);
+  --c-ink-faint: rgb(255 255 255 / 0.58);
+  --c-line: rgb(255 255 255 / 0.2);
+  --c-line-soft: rgb(255 255 255 / 0.14);
+  --c-raised: rgb(255 255 255 / 0.1);
+  --c-accent: color-mix(in srgb, var(--c-accent-theme) 45%, #ffffff);
+}
+.u-on-hero [role="menu"],
+.u-on-hero #mobile-menu {
+  --c-ink: var(--c-ink-theme);
+  --c-ink-dim: var(--c-ink-dim-theme);
+  --c-ink-faint: var(--c-ink-faint-theme);
+  --c-line: var(--c-line-theme);
+  --c-line-soft: var(--c-line-soft-theme);
+  --c-raised: var(--c-raised-theme);
+  --c-accent: var(--c-accent-theme);
+}
+
+/* Gallery cover pattern: a fine grid fading out from the top-left light. */
+.u-gcard-grid {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.2) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(160deg, #000, transparent 70%);
+  mask-image: linear-gradient(160deg, #000, transparent 70%);
+}
+
+/* A project panel eases in each time it is opened (display none → grid
+   restarts the animation). */
+.u-panel:not([hidden]) {
+  animation: u-enter 0.55s var(--ease-expo) both;
 }

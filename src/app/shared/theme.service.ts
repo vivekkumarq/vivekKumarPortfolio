@@ -30,8 +30,8 @@ export const THEME_OPTIONS: ReadonlyArray<{
   accent: string;
   canvas: string;
 }> = [
-  { id: 'dark', label: 'Midnight', hint: 'Default dark', accent: '#5ec8ad', canvas: '#0a0c0e' },
-  { id: 'light', label: 'Daylight', hint: 'Default light', accent: '#16806a', canvas: '#faf9f7' },
+  { id: 'dark', label: 'Midnight', hint: 'Default dark', accent: '#60a5fa', canvas: '#0b0f17' },
+  { id: 'light', label: 'Daylight', hint: 'Default light', accent: '#2563eb', canvas: '#f4f5f8' },
   { id: 'ocean', label: 'Ocean', hint: 'Deep blue', accent: '#4cc4f0', canvas: '#080d14' },
   { id: 'ember', label: 'Ember', hint: 'Warm dark', accent: '#f0a35e', canvas: '#100c0a' },
   { id: 'violet', label: 'Violet', hint: 'Cool dark', accent: '#a78bfa', canvas: '#0b0a11' },
