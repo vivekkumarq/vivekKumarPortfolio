@@ -779,6 +779,7 @@ html:has(.u-palette[open]) {
     radial-gradient(55% 55% at 88% 10%, rgb(168 85 247 / 0.32), transparent 70%),
     radial-gradient(45% 55% at 2% 98%, rgb(20 184 166 / 0.3), transparent 70%),
     radial-gradient(40% 40% at 55% 45%, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent 70%),
+    linear-gradient(90deg, rgb(6 9 18 / 0.55) 0%, rgb(6 9 18 / 0.18) 50%, transparent 78%),
     linear-gradient(0deg, rgb(6 9 18 / 0.95) 0%, transparent 32%);
 }
 .u-hero-grid {
@@ -1175,4 +1176,29 @@ html:has(.u-palette[open]) {
    restarts the animation). */
 .u-panel:not([hidden]) {
   animation: u-enter 0.55s var(--ease-expo) both;
+}
+
+/* Background switcher dots: the chosen scene's dot stretches into a bar. */
+.u-bgdot {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.u-bgdot::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.4);
+  transition:
+    width 0.35s var(--ease-expo),
+    background-color 0.35s ease;
+}
+.u-bgdot:hover::before {
+  background: rgb(255 255 255 / 0.75);
+}
+.u-bgdot[aria-pressed="true"]::before {
+  width: 22px;
+  background: #fff;
 }

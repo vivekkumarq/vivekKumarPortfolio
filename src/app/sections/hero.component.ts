@@ -23,6 +23,7 @@ import {
 import { IconComponent } from '../shared/icon.component';
 import { TechIconComponent } from '../shared/tech-icon.component';
 import { CountUpDirective } from '../shared/count-up.directive';
+import { BACKGROUNDS, BackgroundService, startBackground } from '../shared/hero-backgrounds';
 
 /**
  * One odometer digit. The strip holds 0…max plus a second 0, so a 9 → 0
@@ -111,7 +112,7 @@ const IST_OFFSET_MIN = 330;
     <section id="top" class="u-hero flex min-h-[min(880px,100svh)] flex-col">
       <canvas
         #net
-        class="pointer-events-none absolute inset-0 -z-[2] h-full w-full"
+        class="pointer-events-none absolute inset-0 -z-[2] h-full w-full transition-opacity duration-300"
         aria-hidden="true"
       ></canvas>
       <div class="u-hero-grid" aria-hidden="true"></div>
@@ -119,7 +120,7 @@ const IST_OFFSET_MIN = 330;
 
       <div class="u-shell flex flex-1 flex-col pt-24 sm:pt-28">
         <div
-          class="grid flex-1 items-center gap-12 pb-12 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-14"
+          class="grid flex-1 items-center gap-12 pb-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-14"
         >
           <!-- Left: statement -->
           <div class="min-w-0">
@@ -287,6 +288,38 @@ const IST_OFFSET_MIN = 330;
             </ul>
           </aside>
         </div>
+
+        <!-- Background switcher: the caption steps to the next scene; one dot
+             per scene picks it directly. -->
+        <div
+          class="u-enter flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pb-4"
+          style="--d: 900ms"
+        >
+          <button
+            type="button"
+            (click)="bg.step(1)"
+            class="u-glass inline-flex min-h-9 max-w-full items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.78rem] text-white/80 transition-colors hover:bg-white/15 hover:text-white"
+            [attr.aria-label]="'Background: ' + current().label + '. Show the next one'"
+          >
+            <app-icon name="sparkles" cls="h-3.5 w-3.5 text-teal-300" />
+            <b class="font-semibold text-white">{{ current().label }}</b>
+            <span class="hidden truncate text-white/60 sm:inline">· {{ current().hint }}</span>
+            <app-icon name="chevron-right" cls="h-3.5 w-3.5" />
+          </button>
+
+          <div role="group" aria-label="Choose a background" class="flex flex-wrap">
+            @for (b of backgrounds; track b.id) {
+              <button
+                type="button"
+                class="u-bgdot"
+                [attr.aria-pressed]="bg.kind() === b.id"
+                [attr.aria-label]="b.label"
+                [title]="b.label"
+                (click)="bg.set(b.id)"
+              ></button>
+            }
+          </div>
+        </div>
       </div>
 
       <!-- Highlights ticker. The list is rendered twice for a seamless loop;
@@ -325,6 +358,12 @@ export class HeroComponent {
   protected readonly profile = PROFILE;
 
   private readonly net = viewChild.required<ElementRef<HTMLCanvasElement>>('net');
+
+  protected readonly bg = inject(BackgroundService);
+  protected readonly backgrounds = BACKGROUNDS;
+  protected readonly current = computed(
+    () => BACKGROUNDS.find((b) => b.id === this.bg.kind()) ?? BACKGROUNDS[0],
+  );
 
   private readonly mergedPrs = OPEN_SOURCE.flatMap((p) =>
     p.contributions
@@ -398,9 +437,17 @@ export class HeroComponent {
 
   constructor() {
     const destroyRef = inject(DestroyRef);
+    let scene: { use(kind: ReturnType<BackgroundService['kind']>): void } | undefined;
     afterNextRender(() => {
       this.startClock(destroyRef);
-      startNetwork(this.net().nativeElement, destroyRef);
+      scene = startBackground(this.net().nativeElement, destroyRef, this.bg.kind());
+    });
+    // Switch scenes when the choice changes (from the dots, the caption or
+    // the command menu). The first run happens before the canvas starts and
+    // does nothing.
+    effect(() => {
+      const kind = this.bg.kind();
+      untracked(() => scene?.use(kind));
     });
   }
 
@@ -464,183 +511,4 @@ export class HeroComponent {
     tick();
     destroyRef.onDestroy(() => clearTimeout(timer));
   }
-}
-
-/**
- * The hero backdrop: service nodes drifting slowly, linked when they come
- * within range, with event packets travelling along the links — a quiet
- * picture of a distributed system. Nodes near the pointer link to it.
- *
- * ponytail: O(n²) link search per frame; n stays under 50, so it is about a
- * thousand distance checks. A spatial grid would only matter far beyond that.
- *
- * Runs only while the hero is on screen and the tab is visible; under
- * reduced motion it draws a single still frame.
- */
-function startNetwork(canvas: HTMLCanvasElement, destroyRef: DestroyRef): void {
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const LINK = 165;
-  type Node = { x: number; y: number; vx: number; vy: number; hub: boolean };
-  type Packet = { a: number; b: number; t: number; speed: number };
-
-  let w = 0;
-  let h = 0;
-  let nodes: Node[] = [];
-  let packets: Packet[] = [];
-  let pointer: { x: number; y: number } | null = null;
-  let frame = 0;
-  let onScreen = true;
-
-  const seed = () => {
-    const count = Math.round(Math.min(48, Math.max(18, (w * h) / 24000)));
-    nodes = Array.from({ length: count }, (_, i) => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.22,
-      vy: (Math.random() - 0.5) * 0.22,
-      hub: i % 6 === 0,
-    }));
-    packets = [];
-  };
-
-  const draw = () => {
-    ctx.clearRect(0, 0, w, h);
-
-    if (!still) {
-      for (const n of nodes) {
-        n.x += n.vx;
-        n.y += n.vy;
-        if (n.x < 0 || n.x > w) n.vx *= -1;
-        if (n.y < 0 || n.y > h) n.vy *= -1;
-      }
-    }
-
-    // Links between nearby nodes.
-    const links: [number, number][] = [];
-    ctx.lineWidth = 1;
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-        if (d < LINK) {
-          links.push([i, j]);
-          ctx.strokeStyle = `rgba(148, 163, 255, ${(1 - d / LINK) * 0.28})`;
-          ctx.beginPath();
-          ctx.moveTo(nodes[i].x, nodes[i].y);
-          ctx.lineTo(nodes[j].x, nodes[j].y);
-          ctx.stroke();
-        }
-      }
-    }
-
-    // Links to the pointer.
-    if (pointer) {
-      for (const n of nodes) {
-        const d = Math.hypot(n.x - pointer.x, n.y - pointer.y);
-        if (d < 190) {
-          ctx.strokeStyle = `rgba(94, 234, 212, ${(1 - d / 190) * 0.45})`;
-          ctx.beginPath();
-          ctx.moveTo(n.x, n.y);
-          ctx.lineTo(pointer.x, pointer.y);
-          ctx.stroke();
-        }
-      }
-    }
-
-    // Event packets: spawn on a random live link, travel, expire.
-    if (!still && links.length && packets.length < 16 && Math.random() < 0.08) {
-      const [a, b] = links[Math.floor(Math.random() * links.length)];
-      const speed = 0.006 + Math.random() * 0.01;
-      packets.push(Math.random() < 0.5 ? { a, b, t: 0, speed } : { a: b, b: a, t: 0, speed });
-    }
-    packets = packets.filter((p) => {
-      const A = nodes[p.a];
-      const B = nodes[p.b];
-      p.t += p.speed;
-      if (p.t >= 1 || Math.hypot(A.x - B.x, A.y - B.y) > LINK) return false;
-      const x = A.x + (B.x - A.x) * p.t;
-      const y = A.y + (B.y - A.y) * p.t;
-      ctx.fillStyle = 'rgba(94, 234, 212, 0.18)';
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'rgba(167, 243, 230, 0.95)';
-      ctx.beginPath();
-      ctx.arc(x, y, 1.7, 0, Math.PI * 2);
-      ctx.fill();
-      return true;
-    });
-
-    // Nodes; hubs are larger, violet, with a halo.
-    for (const n of nodes) {
-      if (n.hub) {
-        ctx.fillStyle = 'rgba(192, 132, 252, 0.16)';
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, 7, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.fillStyle = n.hub ? 'rgba(216, 180, 254, 0.9)' : 'rgba(186, 198, 255, 0.55)';
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.hub ? 2.6 : 1.6, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  };
-
-  const resize = () => {
-    const box = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    w = box.width;
-    h = box.height;
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    seed();
-    if (still) draw();
-  };
-
-  const loop = () => {
-    draw();
-    frame = requestAnimationFrame(loop);
-  };
-  const start = () => {
-    if (!still && !frame && onScreen && !document.hidden) frame = requestAnimationFrame(loop);
-  };
-  const stop = () => {
-    cancelAnimationFrame(frame);
-    frame = 0;
-  };
-
-  const host = canvas.parentElement ?? canvas;
-  const onMove = (e: PointerEvent) => {
-    const box = canvas.getBoundingClientRect();
-    pointer = { x: e.clientX - box.left, y: e.clientY - box.top };
-  };
-  const onLeave = () => (pointer = null);
-  const onVisibility = () => (document.hidden ? stop() : start());
-
-  const sizeObserver = new ResizeObserver(resize);
-  sizeObserver.observe(canvas);
-  const viewObserver = new IntersectionObserver(([entry]) => {
-    onScreen = entry.isIntersecting;
-    if (onScreen) start();
-    else stop();
-  });
-  viewObserver.observe(canvas);
-  host.addEventListener('pointermove', onMove, { passive: true });
-  host.addEventListener('pointerleave', onLeave);
-  document.addEventListener('visibilitychange', onVisibility);
-
-  resize();
-  start();
-
-  destroyRef.onDestroy(() => {
-    stop();
-    sizeObserver.disconnect();
-    viewObserver.disconnect();
-    host.removeEventListener('pointermove', onMove);
-    host.removeEventListener('pointerleave', onLeave);
-    document.removeEventListener('visibilitychange', onVisibility);
-  });
 }

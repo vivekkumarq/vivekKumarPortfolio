@@ -15,6 +15,7 @@ import { NAV_LINKS, PROFILE, PROJECTS } from '../core/profile';
 import { IconComponent, type IconName } from './icon.component';
 import { THEME_OPTIONS, ThemeService } from './theme.service';
 import { FONT_OPTIONS, TypographyService } from './typography.service';
+import { BACKGROUNDS, BackgroundService } from './hero-backgrounds';
 
 /**
  * Shared open state, so the header button, the footer hint and the global
@@ -154,6 +155,7 @@ export class CommandPaletteComponent {
   protected readonly palette = inject(PaletteService);
   private readonly theme = inject(ThemeService);
   private readonly typography = inject(TypographyService);
+  private readonly background = inject(BackgroundService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
@@ -222,6 +224,18 @@ export class CommandPaletteComponent {
       icon: 'linkedin',
       run: () => this.openUrl(PROFILE.linkedin),
     },
+    ...BACKGROUNDS.map((b) => ({
+      id: `bg-${b.id}`,
+      group: 'Background',
+      label: b.label,
+      hint: b.hint,
+      keywords: `background hero animation scene ${b.id}`,
+      icon: 'sparkles' as const,
+      run: () => {
+        this.background.set(b.id);
+        requestAnimationFrame(() => document.getElementById('top')?.scrollIntoView());
+      },
+    })),
     ...THEME_OPTIONS.map((t) => ({
       id: `theme-${t.id}`,
       group: 'Theme',
